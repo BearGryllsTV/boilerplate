@@ -141,33 +141,36 @@ The deployment/emails/DNS process has its own guides and things to do. Please re
 ## UpdraftPlus
 - [ ] Follow [this guide](https://arc.adtrak.co.uk/books/web-design-development/page/updraftplus-backups) to add UpdraftPlus to your website
 
-## Admin
+## Domains Admin
 
-- [ ] Create the URL in Salesforce adding relevant data
-- [ ] Create any parked URLs in Salesforce
-- [ ] Archive any old Gitlab projects for the previous site, if applicable
-- [ ] Delete any superfluous/old projects in DeployHQ
-- [ ] Backup and delete any old dev-server or web-server versions
-- [ ] Delete any old staging sites for the old website
+- [ ] Ensure Staging URL is on Salesforce
+- [ ] Update Primary URL on Salesforce with any new information (i.e. if it is now running on HTTPS)
+
+## Forms
+
+- [ ] Test each form - confirm receipt
+- [ ] Ensure you have thank you page(s) or a script to track conversions
+- [ ] Check the form tracking is working with the Internet Marketer
 
 ## General
 
 - [ ] Final Lighthouse speed check - can anything be improved?
-- [ ] Check the form tracking is working with the Internet Marketer
-- [ ] If applicable, check that Engage is recording data
+- [ ] Ecommerce - check ecommerce tracking is working with the Internet Marketer
 - [ ] If applicable, let PPC Consultant know they can start their campaign on the new website
 - [ ] Liaise with Internet Marketer (and Paid Marketer where relevant) to check everything is performing as expected (i.e. redirects are working)
-- [ ] Test each form - confirm receipt
-- [ ] Add time to any relevant Salesforce delivery task, and close any relevant delivery tasks
-- [ ] Ensure Staging URL is on Salesforce
-- [ ] Update Primary URL on Salesforce with any new information (i.e. if it is now running on HTTPS)
+- [ ] If applicable, check that Engage is recording data
+- [ ] Update your time in Salesforce for delivery tasks
 
 ## StatusCake
 
-- [ ] Add the website to [StatusCake](https://resources.adtrak.agency/statuscake/), using the FULL url with HTTP(S)
-- [ ] Contact group: Default Contact Group and your team's group
-- [ ] Check Rate: 5 Min
-- [ ] Is the site running on SSL? If so, use the resource centre guide to add an SSL check too
+- [ ] Add the website to [StatusCake](https://arc.adtrak.co.uk/books/web-design-development/page/statuscake/), using the FULL url with HTTP(S)
+
+## Admin
+
+- [ ] Archive any old Gitlab projects for the previous site, if applicable
+- [ ] Delete any superfluous/old projects in DeployHQ
+- [ ] Backup and delete any old dev-server or web-server versions
+- [ ] Delete any old staging sites for the old website
 
 ## Live Email
 
