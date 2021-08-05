@@ -174,5 +174,5 @@ The deployment/emails/DNS process has its own guides and things to do. Please re
 
 ## Live Email
 
-- [ ] Visit the ['Site is live' email builder](https://resources.adtrak.agency/email-builder/) and create live email with the relevant details
+- [ ] Visit the ['Site is live' email builder](https://email-builder.adtrak.agency/) and create live email with the relevant details
 - [ ] CC Account Manager, Paid Marketer & Internet Marketer; BCC sitelaunch@adtrak.co.uk 
