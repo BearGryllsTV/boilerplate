@@ -7,40 +7,6 @@
     "content-hash": "4def6eece3f57a45fe4d90cb4608c68b",
     "packages": [
         {
-            "name": "adtrak/adtrak-components",
-            "version": "0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/adtrak-core/adtrak-components.git",
-                "reference": "99c6530eb04632f8da7c2afef247c3c875b8eab4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/adtrak-core/adtrak-components/zipball/99c6530eb04632f8da7c2afef247c3c875b8eab4",
-                "reference": "99c6530eb04632f8da7c2afef247c3c875b8eab4",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Dan Farrow",
-                    "email": "dan.farrow@adtrak.co.uk",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Components for an Adtrak build using Tailwind & Timber/Twig",
-            "homepage": "https://www.adtrak.co.uk",
-            "keywords": [
-                "adtrak",
-                "componenets"
-            ],
-            "time": "2020-06-16T13:58:35+00:00"
-        },
-        {
             "name": "altorouter/altorouter",
             "version": "v1.2.0",
             "source": {
