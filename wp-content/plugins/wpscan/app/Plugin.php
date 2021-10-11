@@ -53,6 +53,9 @@ class Plugin {
 	// Plugin path.
 	public $plugin_dir = '';
 
+	// Plugin URI.
+	public $plugin_url = '';
+
 	// Page.
 	public $page_hook = 'toplevel_page_wpscan';
 
@@ -71,6 +74,7 @@ class Plugin {
 	 */
 	public function __construct() {
 		$this->plugin_dir = trailingslashit( str_replace( '\\', '/', dirname( WPSCAN_PLUGIN_FILE ) ) );
+		$this->plugin_url = site_url( str_replace( str_replace( '\\', '/', ABSPATH ), '', $this->plugin_dir ) );
 
 		// Languages.
 		load_plugin_textdomain( 'wpscan', false, $this->plugin_dir . 'languages' );
@@ -469,7 +473,7 @@ class Plugin {
 					// We don't have the plugin/theme, do nothing.
 					break;
 				case 429:
-					array_push( $errors, sprintf( '%s <a href="%s" target="_blank">%s</a>.', __( 'You hit our free API usage limit. To increase your daily API limit please upgrade to paid usage from your', 'wpscan' ), WPSCAN_PROFILE_URL, __( 'WPScan profile page', 'wpscan' ) ) );
+					array_push( $errors, sprintf( '%s <a href="%s" target="_blank">%s</a>.', __( 'You hit your API limit. To increase your daily API limit please upgrade via your ', 'wpscan' ), WPSCAN_PROFILE_URL, __( 'WPScan profile page', 'wpscan' ) ) );
 					break;
 				case 500:
 					array_push( $errors, sprintf( '%s <a href="%s" target="_blank">%s</a>', __( 'There seems to be a problem with the WPScan API. Status: 500. Check the ', 'wpscan' ), WPSCAN_STATUS_URL, __( 'API Status', 'wpscan' ) ) );
@@ -608,6 +612,7 @@ class Plugin {
 	 */
 	public function verify_plugins( $ignored ) {
 		$plugins = array();
+		$ignored[] = 'latest'; // ignore the plugin with the slug 'latest' as this conflicts with our API.
 
 		if ( ! function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -654,6 +659,7 @@ class Plugin {
 	 */
 	public function verify_themes( $ignored ) {
 		$themes = array();
+		$ignored[] = 'latest'; // ignore the theme with the slug 'latest' as this conflicts with our API.
 
 		if ( ! function_exists( 'wp_get_themes' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/theme.php';
