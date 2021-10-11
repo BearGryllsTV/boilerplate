@@ -30,14 +30,14 @@ class TVC_Enhanced {
     if(options){
       Object.assign(this.options, options);
     } 
-    console.log(this.options);
+    //console.log(this.options);
     //this.addEventBindings();  
   }
-  addToCartEventBindings(){
+  singleProductaddToCartEventBindings(variations_data){
    // alert("call first");
     var single_btn = document.getElementsByClassName("single_add_to_cart_button");
     if(single_btn.length > 0){
-      single_btn[0].addEventListener("click", () => this.add_to_cart_click());
+      single_btn[0].addEventListener("click", () => this.add_to_cart_click(variations_data, "Product Pages"));
     }    
   }
   /*
@@ -53,19 +53,20 @@ class TVC_Enhanced {
   /*
    * check remarketing option 
    */
-  view_item_pdp(){
+  view_item_pdp(tvc_po){
     if(this.options.is_admin == true){
       return;
     }
-    //this.options.page_type="Product Page";
+
+    this.options.page_type="Product Page";
     /*
      * Start UA or GA4
      */
     if((this.options.tracking_option =="UA" || this.options.tracking_option == "BOTH") && this.options.property_id ){
       try {
         gtag("event", "view_item", {
-          "event_category":"Enhanced-Ecommerce",
-          "event_label":"view_item_"+tvc_po.tvc_n,
+          "event_category": "Enhanced-Ecommerce",
+          "event_label": "view_item_"+tvc_po.tvc_n,
           "items": [{
             "id": tvc_po.tvc_i,// Product details are provided in an impressionFieldObject.
             "name":  tvc_po.tvc_n,
@@ -80,7 +81,7 @@ class TVC_Enhanced {
           "page_type": this.options.page_type,
           "user_type": this.options.user_type,
           "user_id": this.options.user_id,
-          "client_id":this.getClientId(),
+          //"client_id": this.getClientId(),
           "day_type": this.options.day_type,
           "local_time_slot_of_the_day": this.options.local_time
         });
@@ -97,26 +98,27 @@ class TVC_Enhanced {
     }else if( this.options.tracking_option == "GA4" && this.options.measurement_id ){
       try {
         gtag("event", "view_item", {
-          "event_category":"Enhanced-Ecommerce",
-         "event_label":"view_item_"+tvc_po.tvc_n,
-          "currency": tvc_lc,
+          "event_category": "Enhanced-Ecommerce",
+          "event_label": "view_item_"+tvc_po.tvc_n,
+          "currency": this.options.currency,
           "items": [{
             "item_id": tvc_po.tvc_i,
             "item_name":  tvc_po.tvc_n,
-            "item_category":tvc_po.tvc_c,
+            "item_category": tvc_po.tvc_c,
             "discount": tvc_po.tvc_pd,
-            "affiliation":this.options.affiliation,
+            "affiliation": this.options.affiliation,
             "item_variant": tvc_po.tvc_var,
             "price": tvc_po.tvc_p,
-            "currency": tvc_lc,
-            "quantity": tvc_po.tvc_q
+            "currency": this.options.currency,
+            "quantity": tvc_po.tvc_q,
+            "index":1
           }],
           "non_interaction": true,
           "value": tvc_po.tvc_p * tvc_po.tvc_q,
           "page_type": this.options.page_type,
           "user_type": this.options.user_type,
           "user_id": this.options.user_id,
-          "client_id":this.getClientId(),
+          //"client_id": this.getClientId(),
           "day_type": this.options.day_type,
           "local_time_slot_of_the_day": this.options.local_time
         });
@@ -131,6 +133,8 @@ class TVC_Enhanced {
     //add remarketing and dynamicremarketing tags
     if(this.is_add_remarketing_tags()){
       gtag("event","view_item", {
+        "send_to":this.options.remarketing_snippet_id,
+        "ecomm_pagetype":"product",
         "value": tvc_po.tvc_p,
         "items": [{
           "id": tvc_po.tvc_id, 
@@ -142,33 +146,70 @@ class TVC_Enhanced {
     
 
   }
-  add_to_cart_click( ){
+  get_variation_data_by_id(variations_data, variation_id){
+    //console.log(variations_data.available_variations)
+    var r_val = "";
+    if(variations_data.available_variations.length > 0 ){
+      variations_data.available_variations.forEach((element, index) => { 
+        if(element.variation_id == variation_id){
+          r_val = element;
+        }
+      });
+      return r_val;
+      //console.log(variations_data.available_variations)
+    }
+  }
+  get_variation_attribute_name(p_attributes){
+    //console.log(p_attributes);
+    var p_v_title = "";
+    if(Object.keys(p_attributes).length >0 ){
+      for(var index in p_attributes) {
+        p_v_title+=(p_v_title=="")?p_attributes[index]:' | '+p_attributes[index];
+        
+      }
+      return p_v_title;
+    }
+  }
+  add_to_cart_click( variations_data, page_type ="Product Pages" ){
     if(this.options.is_admin == true){
       return;
     }
+    this.options.page_type = page_type;
     var varPrice = tvc_po.tvc_p;
-    var event_label="add_to_cart_";
-    var selected_variants = "";
-    //var var_s = document.getElementsByClassName("variations").getElementsByTagName("select");
-    /*var selected_variants = $.map($(".variations select :selected"), function(a){
-      return a.value;
-    }).join(" | ");*/
-    if(selected_variants != ""){
-      event_label="add_to_cart_"+this.options.page_type+" | "+tvc_po.tvc_n+" | "+selected_variants;
-      varPrice = jQuery("div.woocommerce-variation-price > span.price > ins >span.woocommerce-Price-amount").text().replace("$","");
-      if (varPrice == "") {
-       varPrice = jQuery("div.woocommerce-variation-price > span.price > .woocommerce-Price-amount").text().replace("$","");
+    var event_label="add_to_cart_";    
+    var variation_attribute_name= "";
+    var vari_data ="";
+    var variation_id = "";
+    var variation_id_obj = document.getElementsByClassName("variation_id");
+    if (variation_id_obj.length > 0) {
+      variation_id = document.getElementsByClassName("variation_id")[0].value;
+    }
+    
+    if(variation_id != ""){
+      vari_data = this.get_variation_data_by_id(variations_data, variation_id);
+      var p_attributes = vari_data.attributes;
+      if( Object.keys(p_attributes).length > 0){
+        variation_attribute_name = this.get_variation_attribute_name(p_attributes);
       }
-      console.log("variants");
+      if(vari_data.display_price){
+        varPrice = vari_data.display_price;
+      }else if(vari_data.display_regular_price){
+        varPrice = vari_data.display_regular_price;
+      }      
+    }
+    //console.log(variation_attribute_name);
+   
+    
+    if(variation_id != ""){
+      event_label="add_to_cart_"+this.options.page_type+" | "+tvc_po.tvc_n+" | "+variation_attribute_name;
     }else if (tvc_po.is_featured == true){
       event_label="add_to_cart_"+this.options.page_type+" | " + this.options.feature_product_label + " | "+tvc_po.tvc_n;
-      console.log("is_featured");
+      //console.log("is_featured");
     }else if (tvc_po.is_onSale == true){
       event_label="add_to_cart_"+this.options.page_type+" | " + this.options.on_sale_label + " | "+tvc_po.tvc_n;
-      console.log("is_onSale");
+      //console.log("is_onSale");
     }else{
       event_label="add_to_cart_"+this.options.page_type+" | "+tvc_po.tvc_n;
-      console.log(" - - ");
     }
     var lastCartTime = this.getCookie("time_add_to_cart");
     var curCartTime = this.getCurrentTime();
@@ -182,7 +223,7 @@ class TVC_Enhanced {
       try {
         gtag("event", "add_to_cart", {
           "event_category":"Enhanced-Ecommerce",
-          "event_label":"add_to_cart_click",
+          "event_label":event_label,
           "non_interaction": true,
           "items": [{
             "id" : tvc_po.tvc_i,
@@ -192,12 +233,12 @@ class TVC_Enhanced {
             "quantity" :jQuery(this).parent().find("input[name=quantity]").val(),
             "list_name":this.options.page_type,
             "list_position": 1,
-            "variant": tvc_po.tvc_var
+            "variant": variation_attribute_name
           }],
           "page_type": this.options.page_type,
           "user_type": this.options.user_type,
           "user_id": this.options.user_id,
-          "client_id":this.getClientId(),
+          //"client_id":this.getClientId(),
           "day_type": this.options.day_type,
           "local_time_slot_of_the_day": this.options.local_time,
           "product_discount": tvc_po.tvc_pd,
@@ -216,26 +257,27 @@ class TVC_Enhanced {
      */
     }else if( this.options.tracking_option == "GA4" && this.options.measurement_id ){
       try {
+        console.log("call GA4");
         gtag("event", "add_to_cart", {
           "event_category":"Enhanced-Ecommerce",
           "event_label":"add_to_cart_click",
-          "currency": tvc_lc,
+          "currency": this.options.currency,
           "non_interaction": true,
           "items": [{
             "item_id" : tvc_po.tvc_i,
             "item_name": tvc_po.tvc_n,
             "item_category" :tvc_po.tvc_c,
             "price":varPrice,
-            "currency": tvc_lc,
+            "currency": this.options.currency,
             "quantity": jQuery(this).parent().find("input[name=quantity]").val(),
-            "item_variant": tvc_po.tvc_var,
+            "item_variant": variation_attribute_name,
             "discount": tvc_po.tvc_pd,
             "affiliation":this.options.affiliation
           }],
           "page_type": this.options.page_type,
           "user_type": this.options.user_type,
           "user_id": this.options.user_id,
-          "client_id":this.getClientId(),
+          //"client_id":this.getClientId(),
           "day_type": this.options.day_type,
           "local_time_slot_of_the_day": this.options.local_time,
           "product_discount": tvc_po.tvc_pd,
@@ -253,7 +295,9 @@ class TVC_Enhanced {
     //add remarketing and dynamicremarketing tags
     if(this.is_add_remarketing_tags()){
       gtag("event","add_to_cart", {
-        "value": tvc_po.tvc_p,
+        "send_to":this.options.remarketing_snippet_id,
+        "ecomm_pagetype":"cart",
+        "value": varPrice,
         "items": [{
           "id": tvc_po.tvc_id, 
           "google_business_vertical": "retail"
@@ -271,7 +315,6 @@ class TVC_Enhanced {
       return;
     }
     this.options.page_type="Thankyou Page";
-    //console.log("call =>0"+this.options.tracking_option+"--"+this.options.property_id);
     if(this.is_add_remarketing_tags()){
       var ads_items = [];
       var ads_value=0;
@@ -283,9 +326,20 @@ class TVC_Enhanced {
           });
       }
       gtag("event","purchase", {
-        "value": ads_value,
+        "send_to":this.options.remarketing_snippet_id,
+        "ecomm_pagetype":"purchase",
+        "value": tvc_td.revenue,
         "items": ads_items
       });
+    }
+
+    if(this.options.google_ads_conversion_tracking == 1 && this.options.conversio_send_to != ""){
+      gtag('event', 'conversion', {
+      'send_to': this.options.conversio_send_to,
+      'value': tvc_td.revenue,
+      'currency': this.options.currency,
+      'transaction_id': tvc_td.id,
+     });
     }
     var last_purchase_time = this.getCookie("time_to_purchase");
     var time_to_purchase = purchase_time - last_purchase_time;
@@ -322,7 +376,7 @@ class TVC_Enhanced {
             "transaction_id":tvc_td.id,
             "affiliation": tvc_td.affiliation,
             "value":tvc_td.revenue,
-            "currency": tvc_lc,
+            "currency": this.options.currency,
             "tax": tvc_td.tax,
             "shipping": tvc_td.shipping,
             "coupon": tvc_td.coupon,
@@ -333,7 +387,7 @@ class TVC_Enhanced {
             "page_type": this.options.page_type,
             "user_type": this.options.user_type,
             "user_id": this.options.user_id,
-            "client_id":this.getClientId(),
+            //"client_id":this.getClientId(),
             "day_type": this.options.day_type,
             "local_time_slot_of_the_day": purchase_time
           });
@@ -343,7 +397,7 @@ class TVC_Enhanced {
             "transaction_id":tvc_td.id,
             "affiliation": tvc_td.affiliation,
             "value":tvc_td.revenue,
-            "currency": tvc_lc,
+            "currency": this.options.currency,
             "tax": tvc_td.tax,
             "shipping": tvc_td.shipping,
             "coupon": tvc_td.coupon,          
@@ -354,7 +408,7 @@ class TVC_Enhanced {
             "page_type": this.options.page_type,
             "user_type": this.options.user_type,
             "user_id": this.options.user_id,
-            "client_id":this.getClientId(),
+            //"client_id":this.getClientId(),
             "day_type": this.options.day_type,
             "local_time_slot_of_the_day": purchase_time,
             "time_taken_to_make_the_purchase": time_to_purchase
@@ -382,7 +436,7 @@ class TVC_Enhanced {
             "item_category": tvc_oc[t_item].tvc_c,
             "item_variant": tvc_oc[t_item].tvc_attr,
             "price": tvc_oc[t_item].tvc_p,
-            "currency": tvc_lc,
+            "currency": this.options.currency,
             "quantity": tvc_oc[t_item].tvc_q
           });         
         }
@@ -394,7 +448,7 @@ class TVC_Enhanced {
             "transaction_id":tvc_td.id,
             "affiliation": tvc_td.affiliation,
             "value":tvc_td.revenue,
-            "currency": tvc_lc,
+            "currency": this.options.currency,
             "tax": tvc_td.tax,
             "shipping": tvc_td.shipping,
             "coupon": tvc_td.coupon,
@@ -405,7 +459,7 @@ class TVC_Enhanced {
             "page_type": this.options.page_type,
             "user_type": this.options.user_type,
             "user_id": this.options.user_id,
-            "client_id":this.getClientId(),
+            //"client_id":this.getClientId(),
             "day_type": this.options.day_type,
             "local_time_slot_of_the_day": purchase_time
           });
@@ -415,7 +469,7 @@ class TVC_Enhanced {
             "transaction_id":tvc_td.id,
             "affiliation": tvc_td.affiliation,
             "value":tvc_td.revenue,
-            "currency": tvc_lc,
+            "currency": this.options.currency,
             "tax": tvc_td.tax,
             "shipping": tvc_td.shipping,
             "coupon": tvc_td.coupon,          
@@ -426,7 +480,7 @@ class TVC_Enhanced {
             "page_type": this.options.page_type,
             "user_type": this.options.user_type,
             "user_id": this.options.user_id,
-            "client_id":this.getClientId(),
+            //"client_id":this.getClientId(),
             "day_type": this.options.day_type,
             "local_time_slot_of_the_day": purchase_time,
             "time_taken_to_make_the_purchase": time_to_purchase
@@ -481,32 +535,6 @@ class TVC_Enhanced {
     document.cookie = name +"=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
   }
   static test(){
-    //console.log(this.options);
-    if(this.options.is_admin == true){
-      return;
-    }
-    /*
-     * Start UA or GA4
-     */
-    if((this.options.tracking_option =="UA" || this.options.tracking_option == "BOTH") && this.options.property_id ){
-      try {
-      }catch(err){
-        gtag("event", "exception", {
-          "description": err,
-          "fatal": false
-        });
-      }
-    /*
-     * Start GA4
-     */
-    }else if( this.options.tracking_option == "GA4" && this.options.measurement_id ){
-      try {        
-      }catch(err){
-        gtag("event", "exception", {
-          "description": err,
-          "fatal": false
-        });
-      }
-    }
+    
   }
 }

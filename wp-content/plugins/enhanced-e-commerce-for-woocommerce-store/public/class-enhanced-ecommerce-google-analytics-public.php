@@ -114,9 +114,10 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
 
     public function __construct($plugin_name, $version) {
         $this->TVC_Admin_Helper = new TVC_Admin_Helper();
-
         $this->plugin_name = $plugin_name;
         $this->version  = $version;
+        $this->tvc_call_hooks();
+
         $this->tvc_aga = $this->get_option("tvc_aga");
         $this->ga_id = $this->get_option("ga_id");
         $this->ga_eeT = $this->get_option("ga_eeT");
@@ -142,8 +143,6 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
         $this->ads_tracking_id = get_option('ads_tracking_id'); 
         $this->ads_ert = get_option('ads_ert');
         $this->ads_edrt = get_option('ads_edrt');
-        //$this->subscription_id = $this->get_option("subscription_id");        
-        //setcookie('subscription_id', $this->subscription_id);
 
         $remarketing = unserialize(get_option('ee_remarketing_snippets'));
         if(!empty($remarketing) && isset($remarketing['snippets']) && $remarketing['snippets']){
@@ -159,15 +158,35 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
             });
         }
     }
+    public function tvc_call_hooks(){
+        add_action("wp_head", array($this, "enqueue_scripts"));
+        add_action("wp_head", array($this, "ee_settings"));
+        add_action("wp_head", array($this, "add_google_site_verification_tag"),1);
+
+        add_action("wp_footer", array($this, "t_products_impre_clicks"));
+        add_action("woocommerce_after_shop_loop_item", array($this, "bind_product_metadata"));
+        add_action("woocommerce_thankyou", array($this, "ecommerce_tracking_code"));
+        add_action("woocommerce_after_single_product", array($this, "product_detail_view"));
+        add_action("woocommerce_after_cart",array($this, "remove_cart_tracking"));
+        //check out step 1,2,3
+        add_action("woocommerce_before_checkout_form", array($this, "checkout_step_1_tracking"));
+        add_action("woocommerce_before_checkout_form", array($this, "checkout_step_2_tracking"));
+        add_action("woocommerce_before_checkout_form", array($this, "checkout_step_3_tracking"));
+        add_action("woocommerce_after_add_to_cart_button", array($this, "add_to_cart"));
+        //add version details in footer
+        add_action("wp_footer", array($this, "add_plugin_details"));
+        //Add Dev ID
+        add_action("wp_head", array($this, "add_dev_id"));
+        add_action("wp_footer",array($this, "tvc_store_meta_data"));
+    }
     public function add_google_site_verification_tag(){
         $TVC_Admin_Helper = new TVC_Admin_Helper();
         $ee_additional_data = $TVC_Admin_Helper->get_ee_additional_data();
         if(isset($ee_additional_data['add_site_varification_tag']) && isset($ee_additional_data['site_varification_tag_val']) && $ee_additional_data['add_site_varification_tag'] == 1 && $ee_additional_data['site_varification_tag_val'] !="" ){
             echo base64_decode($ee_additional_data['site_varification_tag_val']);
-        }
-        
+        }        
                         
-  }
+    }
     public function get_option($key){
         $ee_options = array();
         $my_option = get_option( 'ee_options' );

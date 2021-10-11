@@ -18,7 +18,7 @@
  *
  * @package    Enhanced_Ecommerce_Google_Analytics
  * @subpackage Enhanced_Ecommerce_Google_Analytics/admin
- * @author     Chiranjiv Pathak <chiranjiv@tatvic.com>
+ * @author     Tatvic
  */
 
 class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
@@ -53,12 +53,16 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
     protected $ga_eeT;
     protected $site_url;
     protected $pro_plan_site;
+    protected $google_detail;
     public function __construct($plugin_name, $version) {                       
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        $this->url = $this->get_connect_url();
-        $this->site_url = "admin.php?page=enhanced-ecommerce-google-analytics-admin-display&tab=";
+        $this->url = $this->get_onboarding_page_url();
+        $this->site_url = "admin.php?page=conversios";
         $this->pro_plan_site = $this->get_pro_plan_site();
+        $this->google_detail = $this->get_ee_options_data();
+        //remove container_old_ui_head hook once new UI all implemented
+        add_action('container_old_ui_head',array($this,'create_head'));
     }
     public function tvc_admin_notice(){
         // add fixed message notification
@@ -66,11 +70,11 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
         $ee_additional_data = $this->get_ee_additional_data();
         if(isset($ee_additional_data['dismissed_ee_adimin_notic_a']) && $ee_additional_data['dismissed_ee_adimin_notic_a'] == 1){
         }else{
-            if(!$this->get_subscriptionId()){          
-                echo '<div class="notice notice-info is-dismissible" data-id="ee_adimin_notic_a">
-                      <p>Tatvic EE plugin is now fully compatible with Google Analytics 4. Also, explore the new features of Google Shopping and Dynamic remarketing to reach million of shoppers across Google and scale your eCommerce business faster. <a href="admin.php?page=enhanced-ecommerce-google-analytics-admin-display"><b><u>CONFIGURE NOW</u></b></a></p>
-                     </div>'; 
-            }
+          if(!$this->get_subscriptionId()){          
+            echo '<div class="notice notice-info is-dismissible" data-id="ee_adimin_notic_a">
+                  <p>Tatvic EE plugin is now fully compatible with Google Analytics 4. Also, explore the new features of Google Shopping and Dynamic remarketing to reach million of shoppers across Google and scale your eCommerce business faster. <a href="admin.php?page=conversios"><b><u>CONFIGURE NOW</u></b></a></p>
+                 </div>'; 
+          }
         }
         if(isset($ee_additional_data['dismissed_ee_adimin_notic_b']) && $ee_additional_data['dismissed_ee_adimin_notic_b'] == 1){
         }else{
@@ -79,29 +83,35 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
                 $googleDetail = $google_detail['setting'];
                 if(isset($googleDetail->google_merchant_center_id) && $googleDetail->google_merchant_center_id =="" && $this->subscriptionId != "" ){
                     echo '<div class="notice notice-info is-dismissible" data-id="ee_adimin_notic_b">
-                      <p>Leverage the power of Google Shopping to reach out millions of shoppers across Google. Automate entire Google Shopping and get eligible for free listing when user searches on Google for products similar to your eCommerce business. <a href="admin.php?page=enhanced-ecommerce-google-analytics-admin-display"><b><u>Automate now</u></b></a></p>
+                      <p>Leverage the power of Google Shopping to reach out millions of shoppers across Google. Automate entire Google Shopping and get eligible for free listing when user searches on Google for products similar to your eCommerce business. <a href="admin.php?page=conversios"><b><u>Automate now</u></b></a></p>
                      </div>';
                      
                 }
             } 
         }
+        if(isset($ee_additional_data['dismissed_ee_adimin_notic_c']) && $ee_additional_data['dismissed_ee_adimin_notic_a'] == 1){
+        }else{
+          echo '<div class="notice notice-info is-dismissible" data-id="ee_adimin_notic_c">
+                <p>Now access important eCommerce KPIs and Google Ads campaign performance data directly in your wordpress backend to improve your marketing ROI. <a href="admin.php?page=conversios"><b><u>View it from here.</u></b></a></p>
+               </div>';
+          
+        }
         ?>
         <script>
-            (function( $ ) {
-                $( function() {
-                    $( '.notice' ).on( 'click', '.notice-dismiss', function( event, el ) {
-                        var ee_notice_dismiss_id = $(this).parent('.is-dismissible').attr("data-id");
-                        jQuery.post(myAjaxNonces.ajaxurl,{
-                            action: "tvc_call_notice_dismiss",
-                            data:{ee_notice_dismiss_id:ee_notice_dismiss_id},
-                            dataType: "json",
-                            apiDomainClaimNonce: myAjaxNonces.apiNoticDismissNonce
-                        },function( response ){
-                            
-                        });
-                    });
-                } );
-            })( jQuery );
+          var tvc_ajax_url = '<?php echo admin_url( 'admin-ajax.php' ); ?>';
+          (function( $ ) {
+            $( function() {
+              $( '.notice' ).on( 'click', '.notice-dismiss', function( event, el ) {
+                var ee_notice_dismiss_id = $(this).parent('.is-dismissible').attr("data-id");
+                jQuery.post(tvc_ajax_url,{
+                    action: "tvc_call_notice_dismiss",
+                    data:{ee_notice_dismiss_id:ee_notice_dismiss_id},
+                    dataType: "json"
+                },function( response ){                            
+                });
+              });
+            });
+          })( jQuery );
          </script>
         <?php       
     }
@@ -114,7 +124,10 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
      */
     public function enqueue_styles() {
       $screen = get_current_screen();
-      if ($screen->id == 'toplevel_page_enhanced-ecommerce-google-analytics-admin-display' || (isset($_GET['page']) && $_GET['page'] == 'enhanced-ecommerce-google-analytics-admin-display')) {
+      if ($screen->id == 'toplevel_page_conversios'  || (isset($_GET['page']) && strpos($_GET['page'], 'conversios') !== false) ) {
+          if($_GET['page'] == "conversios_onboarding"){
+            return;
+          }
           wp_register_style('font_awesome', '//use.fontawesome.com/releases/v5.0.13/css/all.css');
           wp_enqueue_style('font_awesome');
           wp_register_style('plugin-bootstrap',ENHANCAD_PLUGIN_URL . '/includes/setup/plugins/bootstrap/css/bootstrap.min.css');
@@ -148,8 +161,10 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
      */
     public function enqueue_scripts() {
       $screen = get_current_screen();
-      if ($screen->id == 'toplevel_page_enhanced-ecommerce-google-analytics-admin-display' || (isset($_GET['page']) && $_GET['page'] == 'enhanced-ecommerce-google-analytics-admin-display')) {
-
+      if ($screen->id == 'toplevel_page_conversios'  || (isset($_GET['page']) && strpos($_GET['page'], 'conversios') !== false) ) {
+          if($_GET['page'] == "conversios_onboarding"){
+            return;
+          }
           wp_enqueue_script( 'custom-jquery', ENHANCAD_PLUGIN_URL . '/admin/js/jquery-3.5.1.min.js', array( 'jquery' ), $this->version, false );
           wp_register_script('popper_bootstrap', '//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js');
           wp_enqueue_script('popper_bootstrap');
@@ -185,36 +200,8 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
       }
     }
 
-    /**
-     * Display Admin Page.
-     *
-     * @since    1.0.0
-     */
-    public function display_admin_page() {      
-      add_menu_page(
-          'Tatvic EE Plugin', 'Tatvic EE Plugin', 'manage_options', "enhanced-ecommerce-google-analytics-admin-display", array($this, 'showPage'), plugin_dir_url(__FILE__) . 'images/tatvic_logo.png', 26
-      );
-      add_submenu_page('enhanced-ecommerce-google-analytics-admin-display', 'Google Analytics', 'Google Analytics', 'manage_options', 'enhanced-ecommerce-google-analytics-admin-display' );
-      add_submenu_page(
-          'enhanced-ecommerce-google-analytics-admin-display',
-          esc_html__('Google Ads', 'enhanced-ecommerce-google-analytics-admin-display'),
-          esc_html__('Google Ads', 'enhanced-ecommerce-google-analytics-admin-display'),
-          'manage_options',
-          'enhanced-ecommerce-google-analytics-admin-display&tab=google_ads',
-          array($this, 'showPage')
-      );
-      add_submenu_page(
-          'enhanced-ecommerce-google-analytics-admin-display',
-          esc_html__('Google Shopping', 'enhanced-ecommerce-google-analytics-admin-display'),
-          esc_html__('Google Shopping', 'enhanced-ecommerce-google-analytics-admin-display'),
-          'manage_options',
-          'enhanced-ecommerce-google-analytics-admin-display&tab=google_shopping_feed',
-          array($this, 'showPage')
-      );
-    }
-    protected function create_head(){
-      $google_detail = $this->get_ee_options_data();
-      $googleDetail = "";
+    public function create_head(){      
+      $google_detail = $this->google_detail;
       if(isset($google_detail['setting'])){
         $googleDetail = $google_detail['setting'];
       }
@@ -243,12 +230,12 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
           <div class="header-section">
             <?php if($plan_id == 1){?>
             <div class="top-section">
-              <p>You are using free plugin. To unlock more features consider <a href="<?php echo $this->pro_plan_site; ?>" target="_blank" class="text-underline">upgrading to pro</a>..!!!</p>
+              <p>You are using free plugin. <a href="<?php echo $this->pro_plan_site.'?utm_source=EE+Plugin+User+Interface&utm_medium=Top+Bar+upgrading+to+pro&utm_campaign=Upsell+at+Conversios'; ?>" target="_blank" class="text-underline">Try premium features at no cost for 1 Month..!!</a></p>
             </div>
           <?php } ?>
             <nav class="navbar navbar-section">
               <a class="navbar-brand">
-                <img src="https://d3rv1nmzvje89q.cloudfront.net/optimized_v5/2017/02/logo_optimize-1024x310.png"/>
+                <img src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/logo.png'; ?>"/>
               </a>
               <div class="form-inline">
                 <span class="nav-btn">
@@ -270,12 +257,13 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
                         $html.="<li>
                           <section class=\"tvc-msg plain\">
                             <div class=\"tvc-msg_wrapper\">
-                              <div class=\"tvc-msg_content\">".$m_date . $m_title.$m_html."</div>
+                              <div class=\"tvc-msg_content\">".$m_title.$m_html."</div>
                               <div class=\"tvc-msg_actions\">
                                 ".$m_link."
                                 <div class=\"tvc-dropdown\">
                                   <button type=\"button\" data-id=".$key." class=\"tvc-notification-button is-tertiary is-dismissible-notification\">Dismiss</button>
                                 </div>
+                                ".$m_date."
                               </div>
                             </div>
                           </section>
@@ -311,11 +299,10 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
                               $( '.tvc-notification' ).on( 'click', '.is-dismissible-notification', function( event, el ) {
                                 var this_id = $(this);
                                 var ee_dismiss_id = $(this).attr("data-id");
-                                jQuery.post(myAjaxNonces.ajaxurl,{
+                                jQuery.post(tvc_ajax_url,{
                                     action: "tvc_call_notification_dismiss",
                                     data:{ee_dismiss_id:ee_dismiss_id},
-                                    dataType: "json",
-                                    TVCNonce: myAjaxNonces.apiotificationDismissNonce
+                                    dataType: "json"
                                 },function( response ){
                                   var rsp = JSON.parse(response);
                                   if(rsp.status == "success"){
@@ -329,56 +316,14 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
                     </div>
                   <?php } ?>
                 </div>
-                <?php /*
-                <div class="account-dropdown">
-                  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <?php 
-                      if (isset($_GET['tab']) && $_GET['tab'] == 'configuration_summary') {
-                          echo 'Configuration Summary';
-                      } else {
-                          echo 'Account Summary';
-                      }
-                  ?>
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-right">
-                    <ul>
-                      <li><a href="<?php echo admin_url('admin.php?page=enhanced-ecommerce-google-analytics-admin-display&id=account-summary'); ?>" class="dropdown-item" type="button">Account Summary</a></li>
-                      <li><a href="<?php echo admin_url('admin.php?page=enhanced-ecommerce-google-analytics-admin-display&id=configuration-summary'); ?>" class="dropdown-item" type="button">Configuration Summary</a></li>
-                    </ul>
-                  </div>
-                </div> */ ?>
+                
               </div>
             </nav>
           </div>
         </div>
         <?php
     }
-    /**
-     * Display Tab page.
-     *
-     * @since    1.0.0
-     */
-    public function showPage() {
-      echo '<div class="tvc_plugin_container">';
-      require_once( 'partials/enhanced-ecommerce-google-analytics-admin-display.php');       
-      $this->create_head();
-      echo '<div class="container">
-        <div class="wiz-tab">';
-        new TVC_Tabs(); 
-        echo $this->call_tvc_site_verified_and_domain_claim();
-        if (!empty($_GET['tab'])) {
-            $get_action = $_GET['tab'];
-        } else {
-            $get_action = "general_settings";
-        }
-        if (method_exists($this, $get_action)) {
-            $this->$get_action();
-        }
-      echo '</div>
-          </div>
-      </div>';
-      echo $this->get_tvc_popup_message();
-    }
+    
     public function check_nall_and_message($val, $msg, $msg_false){
         if((isset($val) && $val != "" && $val != 0) ){
             return $msg;
@@ -386,81 +331,4 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
              return $msg_false;
         }
     }
-    /*public function account(){
-      require_once(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');
-      require_once(ENHANCAD_PLUGIN_DIR . 'includes/setup/account.php');
-      new TVC_Account();
-    }*/
-    public function general_settings() {
-        require_once(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');      
-        require_once( 'partials/general-fields.php');
-    }
-    public function google_ads() {        
-        require_once(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');
-        require_once(ENHANCAD_PLUGIN_DIR . 'includes/setup/google-ads.php');
-        new GoogleAds();
-    }
-    public function google_shopping_feed() {
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/google-shopping-feed.php');
-        new GoogleShoppingFeed();
-    }
-    public function gaa_config_page() { 
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');       
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/google-shopping-feed-gaa-config.php');        
-        new GAAConfiguration();
-    }    
-    public function sync_product_page() {
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/google-shopping-feed-sync-product.php');
-        new SyncProductConfiguration();
-    }
-    public function shopping_campaigns_page() {
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/google-shopping-feed-shopping-campaigns.php');
-        new CampaignsConfiguration();
-    }
-    public function add_campaign_page() {
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/help-html.php');
-        include(ENHANCAD_PLUGIN_DIR . 'includes/setup/add-campaign.php');
-        new AddCampaign();
-    } 
-    /*   
-    public function conversion_tracking() {
-        require_once( 'partials/conversion-tracking.php');
-    }
-    public function google_optimize() {
-        require_once( 'partials/google-optimize.php');
-    }
-    public function about_plugin() {
-        require_once( 'partials/about-plugin.php');
-    }
-    public function country_location() {
-        // date function to hide 30% off sale after certain date
-        return date_default_timezone_set('Australia/Sydney'); // Change this depending on what timezone your in
-    }    
-    public function today() {
-        $this->country_location();
-        return strtotime(date('Y-m-d'));
-    }
-
-    public function current_time() {
-        $this->country_location();
-        return strtotime(date('h:i A'));
-    }
-
-    public function start_date() {
-        $this->country_location();
-        return strtotime(date('Y') . '-09-01');
-    }
-
-    public function end_date() {
-        $this->country_location();
-        return strtotime(date('Y') . '-09-08');
-    }
-
-    public function end_time() {
-        $this->country_location();
-        return strtotime('11:59 PM');
-    }*/
 }

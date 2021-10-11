@@ -61,6 +61,10 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
   protected $ga_DF; 
   protected $tvc_options; 
   protected $TVC_Admin_Helper; 
+  protected $remarketing_snippet_id;
+  protected $remarketing_snippets;
+  protected $conversio_send_to;
+
   /**
    * Enhanced_Ecommerce_Google_Analytics_Public constructor.
    * @param $plugin_name
@@ -71,6 +75,8 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
     $this->TVC_Admin_Helper = new TVC_Admin_Helper();
     $this->plugin_name = $plugin_name;
     $this->version  = $version;
+    $this->tvc_call_hooks();
+
     $this->ga_Dname = "auto";
     $this->tvc_aga = $this->get_option("tvc_aga");
     $this->ga_id = $this->get_option("ga_id");
@@ -94,11 +100,15 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
     $this->ga_IPA = $this->get_option("ga_IPA") == "on" ? true : false; //IP Anony.
     $this->ads_ert = get_option('ads_ert'); //Enable remarketing tags
     $this->ads_edrt = get_option('ads_edrt'); //Enable dynamic remarketing tags
-    $this->ads_tracking_id = get_option('ads_tracking_id'); 
-    $this->ads_ert = get_option('ads_ert');
-    $this->ads_edrt = get_option('ads_edrt');
-    //$this->subscription_id = $this->get_option("subscription_id");        
-    //setcookie('subscription_id', $this->subscription_id);
+    $this->ads_tracking_id = get_option('ads_tracking_id');    
+    $this->google_ads_conversion_tracking = get_option('google_ads_conversion_tracking');
+    $this->conversio_send_to = get_option('ee_conversio_send_to');
+
+    $remarketing = unserialize(get_option('ee_remarketing_snippets'));
+    if(!empty($remarketing) && isset($remarketing['snippets']) && $remarketing['snippets']){
+      $this->remarketing_snippets = base64_decode($remarketing['snippets']);
+      $this->remarketing_snippet_id = isset($remarketing['id'])?$remarketing['id']:"";
+    }
     if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
       // Put your plugin code here
       add_action('woocommerce_init' , function (){
@@ -136,16 +146,51 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
           "ads_tracking_id"=>$this->ads_tracking_id,
           "remarketing_tags"=>$this->ads_ert,
           "dynamic_remarketing_tags"=>$this->ads_edrt,
+          "google_ads_conversion_tracking"=>$this->google_ads_conversion_tracking,
+          "conversio_send_to"=>$this->conversio_send_to,
           "page_type"=>$this->add_page_type(),
           "user_id"=>$user_id,
           "user_type"=>$user_type,
-          "day_type"=>$this->add_day_type()
+          "day_type"=>$this->add_day_type(),
+          "remarketing_snippet_id"=>$this->remarketing_snippet_id,
+          "tvc_ajax_url"=>admin_url( 'admin-ajax.php' )
         );
         /*
          * end tvc_options
          */
       }); 
     } // end if woocommerce        
+  }
+
+  public function tvc_call_hooks(){
+    add_action("wp_head", array($this, "enqueue_scripts"));
+    add_action("wp_head", array($this, "ee_settings"));
+    add_action("wp_head", array($this, "add_google_site_verification_tag"),1);
+
+    add_action("wp_footer", array($this, "t_products_impre_clicks"));
+    add_action("woocommerce_after_shop_loop_item", array($this, "bind_product_metadata"));
+    add_action("woocommerce_thankyou", array($this, "ecommerce_tracking_code"));
+    add_action("woocommerce_after_single_product", array($this, "product_detail_view"));
+    add_action("woocommerce_after_cart",array($this, "remove_cart_tracking"));
+    //check out step 1,2,3
+    add_action("woocommerce_before_checkout_form", array($this, "checkout_step_1_tracking"));
+    add_action("woocommerce_before_checkout_form", array($this, "checkout_step_2_tracking"));
+    add_action("woocommerce_before_checkout_form", array($this, "checkout_step_3_tracking"));
+    add_action("woocommerce_after_add_to_cart_button", array($this, "add_to_cart"));
+    //add version details in footer
+    add_action("wp_footer", array($this, "add_plugin_details"));
+    //Add Dev ID
+    add_action("wp_head", array($this, "add_dev_id"));
+    add_action("wp_footer",array($this, "tvc_store_meta_data"));
+
+    add_action('wp_ajax_get_variation_data', array($this,'get_variation_data') );
+    add_action("wp_ajax_nopriv_get_variation_data" , "get_variation_data");
+  }
+
+  public function get_variation_data(){
+    $data = array('error' => true,'order_result' => "this is test");
+    echo wp_send_json($data);
+    wp_die();
   }
 
   public function getAttributesVariation($product) {
@@ -419,7 +464,6 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
           gtag("config", "'.esc_js($this->gm_id).'",{'.$ga_ip_anonymization.' "cookie_domain":"'.$this->ga_Dname.'",
             "custom_map": {
               "dimension1": "user_id",
-              "dimension2": "client_id",
               "dimension3": "user_type",
               "dimension4": "page_type",
               "dimension5": "day_type",
@@ -450,7 +494,6 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
           gtag("config", "'.esc_js($this->gm_id).'",{'.$ga_ip_anonymization.' "cookie_domain":"'.$this->ga_Dname.'",
             "custom_map": {
               "dimension1": "user_id",
-              "dimension2": "client_id",
               "dimension3": "user_type",
               "dimension4": "page_type",
               "dimension5": "day_type",
@@ -480,7 +523,6 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
           gtag("config", "'.esc_js($this->ga_id).'",{'.$ga_ip_anonymization.' "cookie_domain":"'.$this->ga_Dname.'",
             "custom_map": {
               "dimension1": "user_id",
-              "dimension2": "client_id",
               "dimension3": "user_type",
               "dimension4": "page_type",
               "dimension5": "day_type",
@@ -504,9 +546,8 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
       }
       //add remarketing snippets 
       if($this->ads_tracking_id && ($this->ads_ert || $this->ads_edrt)){         
-        $remarketing = unserialize(get_option('ee_remarketing_snippets'));
-        if(!empty($remarketing) && isset($remarketing['snippets']) && $remarketing['snippets']){
-          echo base64_decode($remarketing['snippets']);
+        if(!empty($this->remarketing_snippets) && $this->remarketing_snippets){
+          echo $this->remarketing_snippets;
         }else{
           $google_detail = $this->TVC_Admin_Helper->get_ee_options_data();
           if(isset($google_detail['setting'])){
@@ -527,7 +568,7 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
   function ecommerce_tracking_code($order_id) {
     global $woocommerce;
     if ($this->disable_tracking($this->ga_eeT) || current_user_can("manage_options") || get_post_meta($order_id, "_tracked", true) == 1){
-     // return;
+     return;
     }
     // Doing eCommerce tracking so unhook standard tracking from the footer
     remove_action("wp_footer", array($this, "ee_settings"));
@@ -568,15 +609,21 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
           }
         }
         $categories=esc_js(join(",", $out));
-        if($_product->product_type === "variation"){        
+        $product_type = "";
+        if (version_compare($woocommerce->version, "2.7", "<")) {
+          $product_type = $_product->product_type;
+        }else{
+          $product_type =$_product->get_type();
+        }
+        if($product_type == "variation"){        
           $attributes=esc_js(wc_get_formatted_variation($_product->get_variation_attributes(), true));
-          if ($_product->variation_has_weight) {
+          /*if ($_product->variation_has_weight) {
             //$p_weight = $_product->get_weight().' '.esc_attr(get_option('woocommerce_weight_unit'));
-          }          
-        }elseif ($_product->product_type === 'simple') {
-          if ($_product->has_weight()) {
+          }*/          
+        }elseif ($product_type == 'simple') {
+          /*if ($_product->has_weight()) {
             //$p_weight = $_product->get_weight().' '.esc_attr(get_option('woocommerce_weight_unit'));
-          }          
+          }*/          
         }
         if (version_compare($woocommerce->version, "2.7", "<")) {
           $orderpage_prod_Array[get_permalink($_product->ID)]=array(
@@ -683,17 +730,26 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
    * @return void
    */
   function add_to_cart() {
-    if ($this->disable_tracking($this->ga_eeT))
+    if ($this->disable_tracking($this->ga_eeT)){
       return;
+    }
     //return if not product page
-    if (!is_single())
+    if (!is_single()){
       return;
+    }
+    global $product,$woocommerce;
+    $variations_data = array();
+    if ( $product->is_type('variable') ) {
+      $variations_data['default_attributes'] = $product->get_default_attributes();
+      $variations_data['available_variations'] = $product->get_available_variations(); //get all child variations
+      $variations_data['available_attributes'] = $product->get_variation_attributes();
+    }
     ?>
     <script>           
       window.addEventListener('load', call_tvc_enhanced,true);
       function call_tvc_enhanced(){
         tvc_js = new TVC_Enhanced(<?php echo json_encode($this->tvc_options); ?>);
-        tvc_js.addToCartEventBindings();
+        tvc_js.singleProductaddToCartEventBindings(<?php echo json_encode($variations_data); ?>);
       }
     </script>
     <?php
@@ -725,6 +781,7 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
     $categories = rtrim($categories, ",");
     //product detail view json
     $prodpage_detail_json = array();
+    
     if(version_compare($woocommerce->version, "2.7", "<")){
       $prodpage_detail_json = array(
         "tvc_id" => esc_html($product->id),
@@ -747,9 +804,9 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
         "tvc_n" => $product->get_title(),
         "tvc_c" => $categories,
         "tvc_p" => $product->get_price(),
-        "tvc_pd" => $this->cal_prod_discount($product->regular_price, $product->sale_price),
+        "tvc_pd" => $this->cal_prod_discount($product->get_regular_price(), $product->get_sale_price()),
         "tvc_ps" => $product->get_stock_status(),
-        "tvc_tst" => $product->get_total_stock(),
+        "tvc_tst" => $product->get_stock_quantity(),
         "tvc_q" => esc_html($product->get_stock_quantity()),
         "tvc_var" => $this->getAttributesVariation($product),
         "is_featured" => $product->is_featured(),
@@ -763,76 +820,10 @@ class Enhanced_Ecommerce_Google_Analytics_Public {
       window.addEventListener('load', call_view_item_pdp,true);
       function call_view_item_pdp(){
         tvc_js = new TVC_Enhanced(<?php echo json_encode($this->tvc_options); ?>);
-        tvc_js.view_item_pdp();
+        tvc_js.view_item_pdp(<?php echo json_encode($prodpage_detail_json); ?>);
       }
     </script>
-    <?php
-    /*if($this->ga_id || $this->tracking_option == "UA" || $this->tracking_option == "BOTH") {
-        $code = '
-        gtag("event", "view_item", {
-                    "event_category":"Enhanced-Ecommerce",
-                    "event_label":"product_impression_pp",
-                    "items": [
-                      {
-                        "id": tvc_po.tvc_i,// Product details are provided in an impressionFieldObject.
-                        "name":  tvc_po.tvc_n,
-                        "category":tvc_po.tvc_c,
-                      }
-                    ],
-                    "non_interaction": true
-        })
-        //add remarketing and dynamicremarketing tags
-        if(adsTringId != "" && ( ads_ert == 1 || ads_edrt == 1)){
-            gtag("event","view_item", {
-                "value": tvc_po.tvc_p,
-                "items": [
-                  {
-                    "id": tvc_po.tvc_id, 
-                    "google_business_vertical": "retail"
-                  }
-                ]
-              });
-        }
-        ';
-        //check woocommerce version
-        if(is_product()){
-            $this->wc_version_compare($code);
-        }
-    }
-
-    if( $this->gm_id && $this->tracking_option == "GA4") {
-        $code = '
-            gtag("event", "view_item", {
-                "event_category":"Enhanced-Ecommerce",
-                "event_label":"product_impression_pp",
-                "currency": tvc_lc,
-                "items": [
-                  {
-                    "item_id": tvc_po.tvc_i,
-                    "item_name":  tvc_po.tvc_n,
-                    "item_category":tvc_po.tvc_c,
-                  }
-                ],
-                "non_interaction": true
-            })
-            //add remarketing and dynamicremarketing tags
-        if(adsTringId != "" && ( ads_ert == 1 || ads_edrt == 1)){
-            gtag("event","view_item", {
-                "value": tvc_po.tvc_p,
-                "items": [
-                  {
-                    "id": tvc_po.tvc_id, 
-                    "google_business_vertical": "retail"
-                  }
-                ]
-              });
-        }
-            ';
-        //check woocommerce version
-        if (is_product()) {
-            $this->wc_version_compare($code);
-        }
-    }*/
+    <?php    
   }
 
     /**

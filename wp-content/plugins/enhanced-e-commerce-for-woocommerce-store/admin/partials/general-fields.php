@@ -26,7 +26,13 @@ if (isset($_GET['connect']) && isset($_GET['subscription_id'])) {
   
   if(property_exists($google_detail,"error") && $google_detail->error == false && !isset($_POST['ee_submit_plugin'])){
     if(property_exists($google_detail,"data") && $google_detail->data != ""){
+      /*
+       * function call for save conversion send to in WP DB
+       */      
       $googleDetail = $google_detail->data;
+      if($googleDetail->plan_id != 1 && $googleDetail->google_ads_conversion_tracking == 1){
+        $TVC_Admin_Helper->update_conversion_send_to();
+      }
       //'website_url' => $googleDetail->site_url,                    
       $postData = [
           'merchant_id' => $googleDetail->merchant_id,          
@@ -94,19 +100,25 @@ if (isset($_GET['connect']) && isset($_GET['subscription_id'])) {
       $_POST['ga_PrivacyPolicy'] = 'on';
       $_POST['google-analytic'] = '';
       //update option in wordpress local database
+      update_option('google_ads_conversion_tracking',  $googleDetail->google_ads_conversion_tracking);
       update_option('ads_tracking_id',  $googleDetail->google_ads_id);
       update_option('ads_ert', $googleDetail->remarketing_tags);
       update_option('ads_edrt', $googleDetail->dynamic_remarketing_tags);
       Enhanced_Ecommerce_Google_Settings::add_update_settings('ee_options');
-      //save data in DB
+      /*
+       * function call for save API data in WP DB
+       */
       $TVC_Admin_Helper->set_update_api_to_db($googleDetail, false);
+      /*
+       * function call for save remarketing snippets in WP DB
+       */
       $TVC_Admin_Helper->update_remarketing_snippets();
       if(isset($googleDetail->google_merchant_center_id) || isset($googleDetail->google_ads_id) ){
-        if( $googleDetail->google_merchant_center_id != "" && $googleDetail->google_ads_id != ""){                    
-          wp_redirect("admin.php?page=enhanced-ecommerce-google-analytics-admin-display&tab=sync_product_page&welcome_msg=true");
+        if( $googleDetail->google_merchant_center_id != "" && $googleDetail->google_ads_id != ""){      
+          wp_redirect("admin.php?page=conversios-google-shopping-feed&tab=sync_product_page&welcome_msg=true");
             exit;
         }else{
-          wp_redirect("admin.php?page=enhanced-ecommerce-google-analytics-admin-display&tab=gaa_config_page&welcome_msg=true");
+          wp_redirect("admin.php?page=conversios-google-shopping-feed&tab=gaa_config_page&welcome_msg=true");
             exit;
         }
       }
@@ -179,8 +191,6 @@ if(isset($google_detail['setting'])){
     $plan_id = $googleDetail->plan_id;
   }
 }
-
-
 ?>
 <div class="tab-content">
   <?php if($message_p){
@@ -194,8 +204,7 @@ if(isset($google_detail['setting'])){
           <div class="licence tvc-licence" >            
             <div class="tvc_licence_key_wapper <?php if($plan_id != 1){?>tvc-hide<?php }?>">
               <p>You are using our free plugin, no licence needed ! Happy analyzing..!! :)</p>
-              <p class="font-weight-bold">To unlock more features of google products, consider our <a href="<?php echo $TVC_Admin_Helper->get_pro_plan_site(); ?>" target="_blank">pro version.</a></p>
-              <?php /*
+              <p class="font-weight-bold">To unlock more features of google products, consider our <a href="<?php echo $TVC_Admin_Helper->get_pro_plan_site().'?utm_source=EE+Plugin+User+Interface&utm_medium=Google+Analytics+Screen+pro+version&utm_campaign=Upsell+at+Conversios'; ?>" target="_blank">pro version.</a></p>              
               <form method="post" name="google-analytic" id="tvc-licence-active"> 
                 <div class="input-group">
                   <input type="text" id="licence_key" name="licence_key" class="form-control" placeholder="Already purchased? Enter licence key" required="">
@@ -204,7 +213,7 @@ if(isset($google_detail['setting'])){
                   </div>
                 </div>
               </form>
-              */ ?>
+              
             </div>         
           </div>
         <?php }?>
@@ -220,9 +229,9 @@ if(isset($google_detail['setting'])){
                   </p>
                   <?php
                   if (isset($data['ga_id']) && $data['ga_id'] != '') {
-                    echo '<p class="ga-text text-right"><a target="_blank" href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
                   } else { 
-                    echo '<p class="ga-text text-right"><a href="#" class="text-underline" data-toggle="modal" data-target="#tvc_google_connect"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
                   }?>
                 </div>
               </div>              
@@ -238,9 +247,9 @@ if(isset($google_detail['setting'])){
                   </p>
                   <?php
                   if (isset($data['gm_id']) && $data['gm_id'] != '') {
-                    echo '<p class="ga-text text-right"><a target="_blank" href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
                   } else { 
-                    echo '<p class="ga-text text-right"><a href="#" class="text-underline" data-toggle="modal" data-target="#tvc_google_connect"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
                   }?>
                 </div>
               </div>              
@@ -256,9 +265,9 @@ if(isset($google_detail['setting'])){
                   </p>
                   <?php
                   if (isset($data['google_ads_id']) && $data['google_ads_id'] != '') {
-                    echo '<p class="ga-text text-right"><a target="_blank" href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
                   } else { 
-                    echo '<p class="ga-text text-right"><a href="#" class="text-underline" data-toggle="modal" data-target="#tvc_google_connect"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
                   }?>
                 </div>
               </div>              
@@ -274,9 +283,9 @@ if(isset($google_detail['setting'])){
                   </p>
                   <?php
                   if (isset($data['google_merchant_id']) && $data['google_merchant_id'] != '') {
-                    echo '<p class="ga-text text-right"><a target="_blank" href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/refresh.svg" alt="refresh"/></a></p>';
                   } else { 
-                    echo '<p class="ga-text text-right"><a href="#" class="text-underline" data-toggle="modal" data-target="#tvc_google_connect"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
+                    echo '<p class="ga-text text-right"><a href="' . $this->url . '" class="text-underline"><img src="'. ENHANCAD_PLUGIN_URL.'/admin/images/icon/add.svg" alt="connect account"/></a></p>';
                   }?>
                 </div>
               </div>              
@@ -411,7 +420,7 @@ $(document).ready(function () {
       $.ajax({
         type: "POST",
         dataType: "json",
-        url: myAjaxNonces.ajaxurl,
+        url: tvc_ajax_url,
         data: data,
         beforeSend: function(){
           tvc_helper.loaderSection(true);

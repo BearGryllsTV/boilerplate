@@ -98,7 +98,7 @@ class CustomApi{
         }
     }
 
-    public function getGoogleAnalyticDetail() {
+    public function getGoogleAnalyticDetail($subscription_id = null) {
         try {
             $url = $this->apiDomain . '/customer-subscriptions/subscription-detail';
             $header = array(
@@ -106,14 +106,12 @@ class CustomApi{
                 "content-type: application/json"
             );
             $ee_options_data = unserialize(get_option('ee_options'));
-            if(isset($ee_options_data['subscription_id'])) {
-                $ee_subscription_id = $ee_options_data['subscription_id'];
-            } else {
-                $ee_subscription_id = null;
+            if($subscription_id == null && isset($ee_options_data['subscription_id'])) {
+                $subscription_id = $ee_options_data['subscription_id'];
             }
             $actual_link = get_site_url();
             $data = [
-                'subscription_id' => $ee_subscription_id,
+                'subscription_id' => $subscription_id,
                 'domain' => $actual_link
             ];
             $postData = json_encode($data);
@@ -342,9 +340,101 @@ class CustomApi{
             return $e->getMessage();
         }
     }
+    public function get_conversion_list($customer_id, $merchant_id) {
+        try {
+            $header = array(
+                "Authorization: Bearer MTIzNA==",
+                "content-type: application/json"
+            );
+            $curl_url = $this->apiDomain . "/google-ads/conversion-list";
+            $postData = [
+                'merchant_id' => $merchant_id,
+                'customer_id' => $customer_id
+            ];
+            $postData = json_encode($postData);
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => esc_url($curl_url),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 1000,
+                CURLOPT_HTTPHEADER => $header,
+                CURLOPT_POSTFIELDS => $postData
+            ));
+            $response = curl_exec($ch);
+            $response = json_decode($response);
+            return $response;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    /**
+     * @since 4.1.4
+     * Get view ID for GA3 reporting API
+     */
+    public function get_analytics_viewid_currency($postData) {
+        try {
+            $header = array(
+                "Authorization: Bearer MTIzNA==",
+                "content-type: application/json"
+            );
+            $curl_url = $this->apiDomain . "/actionable-dashboard/analytics-viewid-currency";
+            $postData['access_token']= $this->generateAccessToken($this->get_tvc_access_token(), $this->get_tvc_refresh_token());
+            $postData = json_encode($postData);
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => esc_url($curl_url),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 1000,
+                CURLOPT_HTTPHEADER => $header,
+                CURLOPT_POSTFIELDS => $postData
+            ));
+            $response = curl_exec($ch);
+            $response = json_decode($response);
+            return $response;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    /**
+     * @since 4.1.4
+     * Get  google analytics reports call using reporting API
+     */
+    public function get_google_analytics_reports($postData) {
+        try {
+            $curl_url = $this->apiDomain . "/actionable-dashboard/google-analytics-reports";
+            $header = array(
+                "Authorization: Bearer MTIzNA==",
+                "content-type: application/json"
+            );
+            
+            $access_token = $this->generateAccessToken($this->get_tvc_access_token(), $this->get_tvc_refresh_token());
+            if($access_token != ""){
+                $postData['access_token']= $access_token; 
+                $postData = json_encode($postData);           
+                $ch = curl_init();
+                curl_setopt_array($ch, array(
+                    CURLOPT_URL => esc_url($curl_url),
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 2000,
+                    CURLOPT_HTTPHEADER => $header,
+                    CURLOPT_POSTFIELDS => $postData
+                ));
+                $response = curl_exec($ch);
+                $response = json_decode($response);
+                return $response;
+            }else{
+                $return = new \stdClass();
+                $return->error = true;
+                $return->message = 'access_token_error';
+                return $return;
+            }           
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
     public function verifyLicenceKey($licence_key, $subscription_id) {
         try {
-            echo $url = $this->apiDomain . '/licence/verify-key';
+            $url = $this->apiDomain . '/licence/verify-key';
             $data = [
                 'key' => $licence_key,
                 'domain' => get_site_url()
@@ -448,7 +538,42 @@ class CustomApi{
             return $e->getMessage();
         }
     }
-
+    public function products_sync($data) {
+        try {
+            $header = array(
+                "Authorization: Bearer MTIzNA==",
+                "content-type: application/json",
+                "AccessToken:".$this->generateAccessToken($this->get_tvc_access_token(), $this->get_tvc_refresh_token())
+            );
+            $curl_url = $this->apiDomain . "/products/batch";            
+            $postData = json_encode($data);          
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => esc_url($curl_url),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 10000,
+                CURLOPT_HTTPHEADER => $header,
+                CURLOPT_POSTFIELDS => $postData
+            ));
+            $response = curl_exec($ch);
+            $response = json_decode($response);
+            $return = new \stdClass();
+            if (isset($response->error) && $response->error == '') {
+                $return->error = false;
+                $return->products_sync = count($response->data->entries);
+                return $return;
+            }else{         
+                $return->error = true;
+                foreach($response->errors as $err){
+                    $return->message = $err;
+                    break;
+                }                               
+                return $return;
+            }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
     public function getSyncProductList($postData) {
         try { 
             $postData["maxResults"] = 100;
@@ -643,11 +768,9 @@ class CustomApi{
         }
     }
 
-    public function generateAccessToken($access_token, $refresh_token) {
-        
+    public function generateAccessToken($access_token, $refresh_token) {        
         $request = "https://www.googleapis.com/oauth2/v1/tokeninfo?"
-                . "access_token=" . $access_token;
-
+                ."access_token=".$access_token;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $request);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -655,7 +778,7 @@ class CustomApi{
         $response = curl_exec($ch);
         $result = json_decode($response);
         if (isset($result->error) && $result->error) {
-            $credentials_file = ENHANCAD_PLUGIN_DIR . 'includes/setup/json/client-secrets.json';
+            $credentials_file = ENHANCAD_PLUGIN_DIR.'includes/setup/json/client-secrets.json';
             $str = file_get_contents($credentials_file);
             $credentials = $str ? json_decode($str, true) : [];
             $url = 'https://www.googleapis.com/oauth2/v4/token';
@@ -669,7 +792,6 @@ class CustomApi{
                 'client_secret' => $clientSecret,
                 'refresh_token' => $refreshToken,
             ];
-
             $postData = json_encode($data);
             $ch = curl_init();
             curl_setopt_array($ch, array(
@@ -679,16 +801,13 @@ class CustomApi{
                 CURLOPT_HTTPHEADER => $header,
                 CURLOPT_POSTFIELDS => $postData
             ));
-            $response = curl_exec($ch);
-            
-            $response = json_decode($response);
-            
+            $response = curl_exec($ch);            
+            $response = json_decode($response);            
             if(isset($response->access_token)){
                 return $response->access_token; 
             }else{
-                return $access_token;
-            }
-           
+                //return $access_token;
+            }           
         } else {
             return $access_token;
         }
