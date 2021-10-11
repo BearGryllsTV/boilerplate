@@ -412,6 +412,78 @@
 			}
 		}
 
+		public static function start_cdn_integration(){
+			if(current_user_can('manage_options')){
+    			$cdn_values = get_option("WpFastestCacheCDN");
+
+    			if($cdn_values){
+    				$std_obj = json_decode($cdn_values);
+    				$cdn_values_arr = array();
+
+    				if(is_array($std_obj)){
+						$cdn_values_arr = $std_obj;
+					}else{
+						array_push($cdn_values_arr, $std_obj);
+					}
+
+    				foreach ($cdn_values_arr as $cdn_key => $cdn_value) {
+	    				if($cdn_value->id == "amazonaws" || $cdn_value->id == "keycdn" || $cdn_value->id == "cdn77"){
+	    					$cdn_value->id = "other";
+	    				}
+
+	    				if($cdn_value->id == $_POST["id"]){
+	    					unset($cdn_value->status);
+	    				}
+    				}
+
+    				$cdn_values_arr = array_values($cdn_values_arr);
+    				
+    				update_option("WpFastestCacheCDN", json_encode($cdn_values_arr));
+    			}
+
+				echo json_encode(array("success" => true));
+				exit;
+			}else{
+				wp_die("Must be admin");
+			}
+		}
+
+		public static function pause_cdn_integration(){
+			if(current_user_can('manage_options')){
+    			$cdn_values = get_option("WpFastestCacheCDN");
+
+    			if($cdn_values){
+    				$std_obj = json_decode($cdn_values);
+    				$cdn_values_arr = array();
+
+    				if(is_array($std_obj)){
+						$cdn_values_arr = $std_obj;
+					}else{
+						array_push($cdn_values_arr, $std_obj);
+					}
+
+    				foreach ($cdn_values_arr as $cdn_key => $cdn_value) {
+	    				if($cdn_value->id == "amazonaws" || $cdn_value->id == "keycdn" || $cdn_value->id == "cdn77"){
+	    					$cdn_value->id = "other";
+	    				}
+
+	    				if($cdn_value->id == $_POST["id"]){
+	    					$cdn_value->status = "pause";
+	    				}
+    				}
+
+    				$cdn_values_arr = array_values($cdn_values_arr);
+    				
+    				update_option("WpFastestCacheCDN", json_encode($cdn_values_arr));
+    			}
+
+				echo json_encode(array("success" => true));
+				exit;
+			}else{
+				wp_die("Must be admin");
+			}
+		}
+
 		public static function remove_cdn_integration(){
 			if(current_user_can('manage_options')){
     			$cdn_values = get_option("WpFastestCacheCDN");
