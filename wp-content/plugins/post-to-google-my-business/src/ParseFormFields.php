@@ -184,13 +184,13 @@ class ParseFormFields
      */
     public function validate_wp_image_size( $image_id )
     {
-        $image_meta = wp_get_attachment_metadata( $image_id );
+        $path = get_attached_file( $image_id );
         list( $url, $width, $height, $is_intermediate ) = wp_get_attachment_image_src( $image_id, 'pgmb-post-image' );
-        $path = $image_meta['file'];
         
         if ( $is_intermediate ) {
+            $uploads_dir = wp_get_upload_dir();
             $intermediate = image_get_intermediate_size( $image_id, [ $width, $height ] );
-            $path = $intermediate['path'];
+            $path = $uploads_dir['basedir'] . "/" . $intermediate['path'];
             $url = $intermediate['url'];
             $width = $intermediate['width'];
             $height = $intermediate['height'];
@@ -212,7 +212,7 @@ class ParseFormFields
      */
     public function get_file_size_from_path( $path )
     {
-        return filesize( $path );
+        return @filesize( $path );
     }
     
     /**
@@ -240,6 +240,9 @@ class ParseFormFields
      */
     public function get_file_size_from_download( $url )
     {
+        if ( !function_exists( 'download_url' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
         $filepath = download_url( $url );
         if ( is_wp_error( $filepath ) ) {
             return false;
