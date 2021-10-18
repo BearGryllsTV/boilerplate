@@ -5,12 +5,11 @@
 </div>#}
 
 <div class="w-1/2 p-2 text-center bg-secondary">
-  {% do action('ld_mobile_top', "Call us today") %}
+  {% do action('ald_default', false) %}
 </div>
 
 <div class="absolute left-0 z-10 hidden w-full p-4 bg-secondary location-numbers top-10 ">
-  {% do action('ld_default', true) %}
-  {% do action('ld_list', false, "inline") %}
+  {% do action('ald_default', false) %}
 </div>
 
 <div class="flex items-center justify-center w-1/2 p-2 text-center menu-btn bg-primary">{# {{ function('icon', 'bars') }} #}<span

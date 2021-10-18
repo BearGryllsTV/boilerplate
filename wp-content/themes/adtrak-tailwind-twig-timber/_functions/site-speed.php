@@ -7,7 +7,7 @@ Defer scripts
 ======================================================================================================================== */
 function add_defer_attribute($tag, $handle) {
   // add script handles to the array below
-  $scripts_to_defer = array('production','adtrak-cookie','location-dynamics-front', 'svgxuse');
+  $scripts_to_defer = array('production','adtrak-cookie','ald-front', 'svgxuse');
 
   foreach($scripts_to_defer as $defer_script) {
     if ($defer_script === $handle) {
