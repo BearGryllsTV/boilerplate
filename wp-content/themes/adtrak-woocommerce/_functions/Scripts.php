@@ -19,7 +19,7 @@ class Scripts
      *
      * @var array
      */
-    public $deferScripts = [];
+    public $deferScripts = ['ald-front'];
 
     public function __construct()
     {
