@@ -835,9 +835,6 @@ select {
 .block {
 	display: block;
 }
-.inline {
-	display: inline;
-}
 .flex {
 	display: flex;
 }
@@ -1678,14 +1675,14 @@ Mobile Nav ************************************************/
 }
 @font-face {
   font-family: 'Source Sans Pro';
-  src: url('../_resources/fonts/SourceSansPro-Regular.ttf') format('truetype');
+  src: url('/wp-content/themes/adtrak-woocommerce/_resources/fonts/SourceSansPro-Regular.ttf') format('truetype');
   font-display: swap;
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
   font-family: 'Source Sans Pro';
-  src: url('../_resources/fonts/SourceSansPro-Bold.ttf') format('truetype');
+  src: url('/wp-content/themes/adtrak-woocommerce/_resources/fonts/SourceSansPro-Bold.ttf') format('truetype');
   font-display: swap;
   font-weight: 700;
   font-style: bold;
