@@ -51,13 +51,6 @@ function my_deregister_styles() {
 }
 add_action('wp_print_styles', 'my_deregister_styles', 100);
 
-// Remove ninja form stylesheets
-function wpgood_nf_display_enqueue_scripts(){
-    wp_dequeue_style( 'nf-display' );
-    wp_dequeue_style( 'nf-fu-jquery-fileupload' );
-}
-add_action( 'nf_display_enqueue_scripts', 'wpgood_nf_display_enqueue_scripts');
-
 
 
 /* ========================================================================================================================
