@@ -72,6 +72,9 @@ module.exports = {
         50: "50vh",
         75: "75vh",
       }),
+      screens: {
+        'landscape': {'raw': '(orientation: landscape)'},
+      },
     },
   },
   variants: {

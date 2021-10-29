@@ -58,6 +58,7 @@
 
 - [ ] Check the forms on staging - are they sending OK?
 - [ ] All fields are relevant (postcode/company) - are any more required?
+- [ ] Form inputs have an appropriate `label` element (can be hidden using a class of `sr-only`)
 - [ ] Check the `to` address for each form - will the client get it?
 - [ ] Check the messages each form displays - are they in keeping with the tone of the website?
 - [ ] Form is sending via an SMTP plugin and `thanks@` OR using `Formspree` or `Sendinblue`
@@ -83,11 +84,16 @@
 
 ## Accessibility
 - [ ] Conduct a Lighthouse test (using Chrome Dev Tools) and check for any quick accessibility improvements that can be made
+
+Identify and resolve common issues:
+
 - [ ] Make sure buttons have `aria-label` attributes
-- [ ] Make sure that the desktop navigation isn't tab-indexable on desktop
+- [ ] Make sure that the mobile navigation isn't tab-indexable on desktop (Press the tab key from the top of the website and make sure that the tab cursor doesn't go off-canvas). 
+- [ ] Make sure buttons and links have descriptive labels (do not use 'Click here' for example)
 - [ ] Make sure links have :focus attributes
-- [ ] Images have SRC attributes (leave empty if lazyloading) and descriptive ALT tags
-- [ ] Complete the [a11y Checklist](https://www.a11yproject.com/checklist/#toc_Success-criteria)
+- [ ] Images have `src` attributes (leave empty if lazyloading) and descriptive `alt` tags
+- [ ] Ensure the heading elements are in hierarchical order (`h1` > `h2` > `h3` > `h4`) and do not skip levels.
+- [ ] Check that the site can be rotated into landscape mode on mobile devices and still looks/functions OK (tip: you can use the `lansdcape:` class to make landscape-specific adjustments)
 - [ ] Rerun a lighthouse test to check for improved score
 
 ## Proofing
