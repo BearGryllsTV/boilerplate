@@ -35,7 +35,6 @@
     "@tailwindcss/forms": "^0.2.1",
     "autoprefixer": "^10.4.0",
     "cssnano": "^5.0.8",
-    "glob-parent": "^6.0.2",
     "gulp-if": "^2.0.2",
     "gulp-rename": "^1.4.0",
     "gulp-terser": "^1.2.0",
