@@ -27,7 +27,6 @@
     "cross-env": "^7.0.2",
     "del": "^4.1.0",
     "gulp": "^4.0.2",
-    "gulp-imagemin": "^8.0.0",
     "gulp-postcss": "^9.0.1",
     "postcss": "^8.3.11",
     "postcss-nested": "^5.0.6"
@@ -40,7 +39,6 @@
     "gulp-if": "^2.0.2",
     "gulp-rename": "^1.4.0",
     "gulp-terser": "^1.2.0",
-    "node-sass": "^6.0.1",
     "postcss-import": "^13.0.0",
     "postcss-simple-vars": "^6.0.1",
     "rollup": "^2.58.3",
@@ -49,6 +47,6 @@
     "tailwindcss-filters": "^3.0.0",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
-    "yargs": "^14.2.3"
+    "yargs": "^17.2.1"
   }
 }
