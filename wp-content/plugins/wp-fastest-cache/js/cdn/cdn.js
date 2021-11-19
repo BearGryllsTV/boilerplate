@@ -1,6 +1,7 @@
 var WpfcCDN = {
 	values: {"name" : "", "cdnurl" : "", "originurl" : "", "file_types" : "", "keywords" : "", "excludekeywords" : ""},
 	id : "",
+	nonce: "",
 	template_url : "",
 	content : "",
 	interval : false,
@@ -21,7 +22,9 @@ var WpfcCDN = {
 	},
 	set_params: function(obj){
 		this.id = obj.id;
+		this.nonce = obj.nonce;
 		this.template_url = obj.template_main_url + "/" + this.id + ".php";
+
 		if(obj.values){
 			this.values = obj.values;
 		}
@@ -249,7 +252,7 @@ var WpfcCDN = {
 			type: 'POST',
 			dataType: "json",
 			url: ajaxurl,
-			data : {"action": "wpfc_save_cdn_integration", "values" : self.values, "file_types" : self.values.file_types, "keywords" : self.values.keywords, "excludekeywords" : self.values.excludekeywords},
+			data : {"action": "wpfc_save_cdn_integration", "nonce" : self.nonce, "values" : self.values, "file_types" : self.values.file_types, "keywords" : self.values.keywords, "excludekeywords" : self.values.excludekeywords},
 		    success: function(res){
 				jQuery("div[wpfc-cdn-name='" + self.id + "']").find("div.meta").addClass("isConnected");
 

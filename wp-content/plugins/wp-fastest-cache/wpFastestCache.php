@@ -3,7 +3,7 @@
 Plugin Name: WP Fastest Cache
 Plugin URI: http://wordpress.org/plugins/wp-fastest-cache/
 Description: The simplest and fastest WP Cache system
-Version: 0.9.4
+Version: 0.9.5
 Author: Emre Vona
 Author URI: http://tr.linkedin.com/in/emrevona
 Text Domain: wp-fastest-cache
@@ -810,8 +810,8 @@ GNU General Public License for more details.
 				}
 
 				$path_arr = array(
-								  "cachepath" => $_POST["cachepath"],
-							  	  "optimizedpath" => $_POST["optimizedpath"]
+								  "cachepath" => sanitize_text_field($_POST["cachepath"]),
+							  	  "optimizedpath" => sanitize_text_field($_POST["optimizedpath"])
 							);
 
 				if(get_option("WpFastestCachePathSettings") === false){
@@ -1152,7 +1152,7 @@ GNU General Public License for more details.
 				// Yet Another Stars Rating
 				if($_POST["action"] == "yasr_send_visitor_rating"){
 					$to_clear_parents = false;
-					$post_id = $_POST["post_id"];
+					$post_id = sanitize_text_field($_POST["post_id"]);
 				}
 
 				// All In One Schema.org Rich Snippets

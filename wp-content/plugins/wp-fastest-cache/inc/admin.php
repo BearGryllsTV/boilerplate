@@ -921,8 +921,8 @@
 				
 				$htaccess = preg_replace("/\n+/","\n", $htaccess);
 
-				echo "<noscript id='wpfc-htaccess-data'>".$htaccess."</noscript>";
-				echo "<noscript id='wpfc-htaccess-path-data'>".$path.".htaccess"."</noscript>";
+				echo "<noscript id='wpfc-htaccess-data'>".esc_html($htaccess)."</noscript>";
+				echo "<noscript id='wpfc-htaccess-path-data'>".esc_html($path).".htaccess"."</noscript>";
 				?>
 				<script type="text/javascript">
 					jQuery(document).ready(function(){
@@ -1031,8 +1031,8 @@
 							}else if((isset($_POST["wpFastestCachePage"])) && ("wpfc-".$_POST["wpFastestCachePage"] == $value["id"])){
 								$checked = ' checked="checked" ';
 							}
-							echo '<input '.$checked.' type="radio" id="'.$value["id"].'" name="tabGroup1" style="display:none;">'."\n";
-							echo '<label for="'.$value["id"].'">'.$value["title"].'</label>'."\n";
+							echo '<input '.esc_html($checked).' type="radio" id="'.esc_html($value["id"]).'" name="tabGroup1" style="display:none;">'."\n";
+							echo '<label for="'.esc_html($value["id"]).'">'.esc_html($value["title"]).'</label>'."\n";
 						}
 					?>
 				    <br>
@@ -2011,7 +2011,8 @@
 
 											WpfcCDN.init({"id" : jQuery(e.currentTarget).attr("wpfc-cdn-name"),
 							    				"template_main_url" : "<?php echo plugins_url('wp-fastest-cache/templates/cdn'); ?>",
-							    				"values" : data
+							    				"values" : data,
+							    				"nonce" : "<?php echo wp_create_nonce("cdn-nonce"); ?>"
 							    			});
 
 

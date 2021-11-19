@@ -687,6 +687,12 @@
 				}
 			}
 
+			// for Divi Theme
+			if(defined('DONOTCACHEPAGE') && (get_template() == "Divi")){
+				return $buffer."<!-- DONOTCACHEPAGE is defined as TRUE -->";
+			}
+
+
 			if($this->exclude_page($buffer)){
 				$buffer = preg_replace('/<\!--WPFC_PAGE_TYPE_[a-z]+-->/i', '', $buffer);	
 				return $buffer;
