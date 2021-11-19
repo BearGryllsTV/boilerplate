@@ -329,11 +329,25 @@ class ParseFormFields
         throw new \UnexpectedValueException( __( "Could not parse post locations", 'post-to-google-my-business' ) );
     }
     
+    public function get_link_parsing_mode()
+    {
+        $valid_modes = [
+            'none',
+            'inline',
+            'nextline',
+            'table'
+        ];
+        if ( !isset( $this->form_fields['mbp_link_parsing_mode'] ) || !in_array( $this->form_fields['mbp_link_parsing_mode'], $valid_modes ) ) {
+            return 'inline';
+        }
+        return $this->form_fields['mbp_link_parsing_mode'];
+    }
+    
     public function generate_placeholder_variables( $parent_post_id, $location )
     {
         $decorators = [
             'post_permalink'     => new PostPermalink( $parent_post_id ),
-            'post_variables'     => new PostVariables( $parent_post_id ),
+            'post_variables'     => new PostVariables( $parent_post_id, $this->get_link_parsing_mode() ),
             'user_variables'     => new UserVariables( $parent_post_id ),
             'site_variables'     => new SiteVariables(),
             'location_variables' => new LocationVariables( $location ),

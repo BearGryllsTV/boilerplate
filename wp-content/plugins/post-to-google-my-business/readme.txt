@@ -4,7 +4,7 @@ Donate link: https://tycoonmedia.net/?utm_source=repository&utm_medium=link&utm_
 Tags: google my business, google, business, auto publish, posts, post, local search, google my business posts, google places, google plus, google+
 Requires at least: 4.9.0
 Tested up to: 5.8.1
-Stable tag: 2.2.48
+Stable tag: 2.2.49
 Requires PHP: 5.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -93,6 +93,9 @@ Post to Google My Business relies on the WP Cron system to send out scheduled po
 6. Auto-post template settings
 
 == Changelog ==
+
+= 2.2.49 =
+* Add option to advanced post options to change link parsing mode
 
 = 2.2.48 =
 * Temporary fix for the cURL error 60: SSL certificate problem: certificate has expired error
