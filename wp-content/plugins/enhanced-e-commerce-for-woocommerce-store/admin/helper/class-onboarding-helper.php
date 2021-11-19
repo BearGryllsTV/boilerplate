@@ -572,11 +572,19 @@ if(!class_exists('Conversios_Onboarding_ApiCall') ){
         //$tvc_data = json_decode(base64_decode($postData['tvc_data']));
         //unset($postData['tvc_data']);
         $url = $this->apiDomain . '/google-analytics/account-list';
-        $header = array("Authorization: Bearer MTIzNA==", "content-type: application/json", "AccessToken:$this->access_token");        
+        $header = array("Authorization: Bearer MTIzNA==", "content-type: application/json", "AccessToken:$this->access_token"); 
+        $max_results = 10; 
+        $page = (isset($postData['page']) && $postData['page'] >1)?$postData['page']:"1";
+        if($page > 1){
+          //set index
+          $page = (($page-1) * $max_results)+1;
+        }       
         $data = [
-            'merchant_id' => $this->merchantId,
-            'type' => $postData['type']
+          'type' => $postData['type'],
+          'page'=>$page,
+          'max_results'=>$max_results
         ];
+        //print_r($data);
         $curl_url = $url;
         $postData = json_encode($data);
         $ch = curl_init();

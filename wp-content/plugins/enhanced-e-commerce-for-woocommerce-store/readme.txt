@@ -1,4 +1,4 @@
-===  Google Analytics and Google Shopping plugin for WooCommerce ===
+=== Conversios.io - Google Analytics and Google Shopping plugin for WooCommerce ===
 Contributors: Tatvic, Conversios
 Plugin Name: Enhanced Ecommerce for WooCommerce Store
 Plugin URI: https://wordpress.org/plugins/enhanced-e-commerce-for-woocommerce-store/
@@ -6,10 +6,10 @@ Tags: Google Analytics tracking, Dynamic Remarketing, Google Shopping automation
 Author URI: https://conversios.io/
 Author: Tatvic
 Requires at least: 1.4.1
-Tested up to: 5.8.1
+Tested up to: 5.8.2
 Requires PHP: 5.6 or Higher
-Stable tag: 4.3.1
-Version: 4.3.1
+Stable tag: 4.4.1
+Version: 4.4.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -379,6 +379,32 @@ You can resolve the duplication of data by removing the manually implemented GA 
 
 
 == Changelog ==
+
+= 4.4.1 - 15/11/2021 =
+
+* Earlier, agency owners having multiple Google analytics accounts associated with a single email id used to face issues in loading all the Google analytics accounts on the onboarding screen. We have added load more capability in order to provide smooth user experience
+
+= 4.4.0 - 01/11/2021 =
+
+* In this release, we have added product type and custom attributes for the product sync capability which will help in enhancing your product feeds in Google Merchant Center. These attributed will automatically collected and pushed to GMC when you are syncing products.
+
+= 4.3.5 - 23/10/2021 =
+
+* We have fixed the onboarding signup issue which was raised by some users.
+
+= 4.3.4 - 21/10/2021 =
+
+* Site verification and domainc claim issue got fixed for the manually created merchant center accounts
+* Some users were facing difficulty on the onboarding page because of the access token expiry. The issue is fixed now.
+
+= 4.3.3 - 14/10/2021 =
+
+* Performance enhancement for product sync
+
+= 4.3.2 - 13/10/2021 =
+
+* We have fixed the admin notice issue which was raised by some users.
+
 = 4.3.1 - 08/10/2021 =
 
 * Pricing plans are updated in the UI

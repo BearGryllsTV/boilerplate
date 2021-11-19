@@ -89,7 +89,7 @@ class Enhanced_Ecommerce_Google_Analytics_Admin extends TVC_Admin_Helper {
                 }
             } 
         }
-        if(isset($ee_additional_data['dismissed_ee_adimin_notic_c']) && $ee_additional_data['dismissed_ee_adimin_notic_a'] == 1){
+        if(isset($ee_additional_data['dismissed_ee_adimin_notic_c']) && $ee_additional_data['dismissed_ee_adimin_notic_c'] == 1){
         }else{
           echo '<div class="notice notice-info is-dismissible" data-id="ee_adimin_notic_c">
                 <p>Now access important eCommerce KPIs and Google Ads campaign performance data directly in your wordpress backend to improve your marketing ROI. <a href="admin.php?page=conversios"><b><u>View it from here.</u></b></a></p>

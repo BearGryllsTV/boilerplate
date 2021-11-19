@@ -14,11 +14,13 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 		protected $plan_id = 1;
 		protected $tvc_data = array();
 		protected $last_login;
+		protected $is_refresh_token_expire;
 		public function __construct( ){
 			if ( ! is_admin() ) {
 				return;
 			}
 			$this->includes();
+
 			/**
 			 *  Set Var
 			 */
@@ -29,6 +31,7 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 
 			$this->connect_url =  $this->TVC_Admin_Helper->get_connect_url();
 			$this->tvc_data = $this->TVC_Admin_Helper->get_store_data();
+			$this->is_refresh_token_expire = $this->TVC_Admin_Helper->is_refresh_token_expire();
 			/**
 				* check last login for check RefreshToken
 				*/
@@ -111,6 +114,8 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 					$ee_additional_data = $this->TVC_Admin_Helper->get_ee_additional_data();
 					$ee_additional_data['ee_last_login'] = current_time( 'timestamp' );
 					$this->TVC_Admin_Helper->set_ee_additional_data($ee_additional_data);
+
+					$this->is_refresh_token_expire = false;
 				}			
 	  		//$this->tvc_data = json_encode($this->tvc_data);
 			}
@@ -199,7 +204,7 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 		            <!-- onborading left start -->
 								<div class="onboardingstepwrap">									
 									<!-- step-0 start -->
-								  <div class="onbordording-step onbrdstep-0 gglanystep <?php if($this->subscriptionId == "" || $this->tvc_data['g_mail']==""){ echo "activestep"; }else{echo "selectedactivestep";} ?>">
+								  <div class="onbordording-step onbrdstep-0 gglanystep <?php if($this->subscriptionId == "" || $this->tvc_data['g_mail']=="" || $this->is_refresh_token_expire == true ){ echo "activestep"; }else{echo "selectedactivestep";} ?>">
 							      <div class="stepdtltop" data-is-done="<?php echo $complete_step['step-0']; ?>" id="google-signing" data-id="step_0">
 						          <div class="stepleftround">
 						            <img src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/check-wbg.png'; ?>" alt="" />
@@ -210,8 +215,7 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 						          </div>
 							      </div>
 							      <div class="stepmoredtlwrp">
-						          <div class="stepmoredtl">
-						          	
+						          <div class="stepmoredtl">						          	
 						          	<?php if(!isset($this->tvc_data['g_mail']) || $this->tvc_data['g_mail'] == "" || $this->subscriptionId == ""){?>
 						          		<div class="google_connect_url google-btn">
 													  <div class="google-icon-wrapper">
@@ -220,20 +224,31 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 													  <p class="btn-text"><b>Sign in with google</b></p>
 													</div>
 						          	<?php } else{?>
-						          		<div class="google_connect_url google-btn">
-													  <div class="google-icon-wrapper">
-													    <img class="google-icon" src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/g-logo.png'; ?>"/>
-													  </div>
-													  <p class="btn-text mr-35"><b>Reauthorize</b></p>
-													</div>
-						          	<?php } ?>
+						          		
+													<?php if($this->is_refresh_token_expire == true){?>
+														<p class="alert alert-primary">It seems the token to access your Google accounts is expired. Sign in again to continue.</p>
+														<div class="google_connect_url google-btn">
+														  <div class="google-icon-wrapper">
+														    <img class="google-icon" src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/g-logo.png'; ?>"/>
+														  </div>
+														  <p class="btn-text"><b>Sign in with google</b></p>
+														</div>
+													<?php } else{ ?>
+														<div class="google_connect_url google-btn">
+														  <div class="google-icon-wrapper">
+														    <img class="google-icon" src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/g-logo.png'; ?>"/>
+														  </div>
+														  <p class="btn-text mr-35"><b>Reauthorize</b></p>
+														</div>
+													<?php } ?>
+												<?php } ?>
 						          	<p>Make sure you sign in with the google account that has all privileges to access google analytics, google ads and google merchant center account.</p>						          	
 						          </div>
 						        </div>
 								  </div>
 								  <!-- step-0 over -->
 								  <!-- step-1 start -->
-								  <div class="onbordording-step onbrdstep-1 gglanystep <?php echo ($complete_step['step-1']==1 && $this->tvc_data['g_mail'])?'selectedactivestep':''; ?> <?php if($this->subscriptionId != "" && $this->tvc_data['g_mail']){ echo "activestep"; } ?>">
+								  <div class="onbordording-step onbrdstep-1 gglanystep <?php echo ($complete_step['step-1']==1 && $this->tvc_data['g_mail'] && $this->is_refresh_token_expire == false )?'selectedactivestep':''; ?> <?php if($this->subscriptionId != "" && $this->tvc_data['g_mail'] && $this->is_refresh_token_expire == false){ echo "activestep"; } ?>">
 							      <div class="stepdtltop" data-is-done="<?php echo $complete_step['step-1']; ?>" id="google-analytics" data-id="step_1">
 						          <div class="stepleftround">
 						            <img src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/check-wbg.png'; ?>" alt="" />
@@ -255,9 +270,19 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 			                          Universal Analytics (Google Analytics 3)
 				                      </label>
 				                      <div id="UA" class="slctunivr-filed">
-			                          <select class="slect2bx google_analytics_sel" id="ua_web_property_id">
+			                          <?php /*<select class="slect2bx google_analytics_sel" id="ua_web_property_id">
 		                              <option value=''>Select Property Id</option>  
-			                          </select>
+			                          </select> */ ?>
+			                          <div class="tvc-dropdown"> 
+																  <div class="tvc-dropdown-header" id="ua_web_property_id_option_val"  data-accountid="<?php if($googleDetail->ua_analytic_account_id){ echo $googleDetail->ua_analytic_account_id; } ?>" data-val="<?php if($googleDetail->property_id){ echo $googleDetail->property_id; } ?>"><?php if($googleDetail->property_id){
+																  	echo $googleDetail->property_id;
+																  }else{?>Select Property Id<?php } ?></div>
+																  <div class="tvc-dropdown-content" id="ua_web_property_id_option">
+																    <div class="tvc-select-items"><option value="">Select Property Id</option></div>      
+																    <div class="tvc-ua-option-more option">Load More</div>
+																  </div>
+																</div>
+
 				                      </div>
 				                    </div>
 					                    <div class="cstmrdobtn-item">
@@ -267,9 +292,21 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 				                          Google Analytics 4
 					                      </label>
 					                      <div id="GA4" class="slctunivr-filed">
-				                          <select class="slect2bx google_analytics_sel" id="ga4_web_measurement_id">
+				                          <?php /*<select class="slect2bx google_analytics_sel" id="ga4_web_measurement_id">
 			                              <option value=''>Select Measurement Id</option>   
-				                          </select>   
+				                          </select> */ ?>
+				                          <div class="tvc-dropdown"> 
+																	  <div class="tvc-dropdown-header" id="ga4_web_measurement_id_option_val" data-accountid="<?php if($googleDetail->ga4_analytic_account_id){ echo $googleDetail->ga4_analytic_account_id; } ?>" data-val="<?php if($googleDetail->measurement_id){ echo $googleDetail->measurement_id; } ?>">
+																	  <?php if($googleDetail->measurement_id){
+																  		echo $googleDetail->measurement_id;
+																  	}else{?>Select Measurement Id
+																  	<?php } ?></div>
+																	  <div class="tvc-dropdown-content" id="ga4_web_measurement_id_option">
+																	    <div class="tvc-select-items"><option value="">Select Measurement Id</option></div>      
+																	    <div class="tvc-ga4-option-more option">Load More</div>
+																	  </div>
+																	</div>
+
 					                      </div>
 					                    </div>
 					                    <div class="cstmrdobtn-item">
@@ -280,15 +317,37 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 					                      </label>
 					                      <div id="BOTH" class="slctunivr-filed">
 				                          <div class="botslectbxitem">
-				                            <select class="slect2bx google_analytics_sel" id="both_web_property_id">
+				                            <?php /*<select class="slect2bx google_analytics_sel" id="both_web_property_id">
 				                              <option value=''>Select Property Id</option>
-				                          </select>
+				                          	</select>*/ ?>
+				                          	<div class="tvc-dropdown"> 
+																		  <div class="tvc-dropdown-header" id="both_ua_web_property_id_option_val" data-accountid="<?php if($googleDetail->ua_analytic_account_id){ echo $googleDetail->ua_analytic_account_id; } ?>" data-val="<?php if($googleDetail->property_id){ echo $googleDetail->property_id; } ?>"><?php if($googleDetail->property_id){
+																  	echo $googleDetail->property_id;
+																  }else{?>Select Property Id<?php } ?></div>
+																		  <div class="tvc-dropdown-content" id="both_ua_web_property_id_option">
+																		    <div class="tvc-select-items"><option value="">Select Property Id</option></div>      
+																		    <div class="tvc-ua-option-more option">Load More</div>
+																		  </div>
+																		</div>
+
 				                          </div>
 				                          <div class="botslectbxitem">
-			                              <select class="slect2bx google_analytics_sel" id="both_web_measurement_id">
+			                              <?php /*<select class="slect2bx google_analytics_sel" id="both_web_measurement_id">
 			                                <option value=''>Select Measurement Id</option>  
-				                            </select>
+				                            </select> */ ?>
+				                            <div class="tvc-dropdown"> 
+																		  <div class="tvc-dropdown-header" id="both_ga4_web_measurement_id_option_val" data-accountid="<?php if($googleDetail->ga4_analytic_account_id){ echo $googleDetail->ga4_analytic_account_id; } ?>" data-val="<?php if($googleDetail->measurement_id){ echo $googleDetail->measurement_id; } ?>">
+																		  	<?php if($googleDetail->measurement_id){
+																  		echo $googleDetail->measurement_id;
+																  	}else{?>Select Measurement Id
+																  	<?php } ?></div>
+																		  <div class="tvc-dropdown-content" id="both_ga4_web_measurement_id_option">
+																		    <div class="tvc-select-items"><option value="">Select Measurement Id</option></div>      
+																		    <div class="tvc-ga4-option-more option">Load More</div>
+																		  </div>
+																		</div>
 				                          </div>
+				                          <div id="old_tracking" data-tracking_option="<?php echo $tracking_option; ?>" data-measurement_id="<?php echo $googleDetail->measurement_id; ?>" data-property_id="<?php echo $googleDetail->property_id; ?>"></div>
 					                      </div>
 					                    </div>
 					                </div>
@@ -323,7 +382,7 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 								  </div>
 								  <!-- step-1 over -->
 								  <!-- step-2 start -->
-								  <div class="onbordording-step onbrdstep-2 ggladsstep <?php echo ($complete_step['step-2']==1)?'selectedactivestep':''; ?>">
+								  <div class="onbordording-step onbrdstep-2 ggladsstep <?php echo ($complete_step['step-2']==1 && $this->is_refresh_token_expire == false)?'selectedactivestep':''; ?>">
 							      <div class="stepdtltop" data-is-done="<?php echo $complete_step['step-2']; ?>" id="google-ads" data-id="step_2">
 						          <div class="stepleftround">
 						            <img src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/check-wbg.png'; ?>" alt="" />
@@ -414,7 +473,7 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 								  </div>
 								  <!-- step-2 over -->
 								  <!-- step-3 start -->
-								  <div class="onbordording-step onbrdstep-3 gglmrchntstep <?php echo ($complete_step['step-3']==1)?'selectedactivestep':''; ?>">
+								  <div class="onbordording-step onbrdstep-3 gglmrchntstep <?php echo ($complete_step['step-3']==1 && $this->is_refresh_token_expire == false )?'selectedactivestep':''; ?>">
 							      <div class="stepdtltop" data-is-done="<?php echo $complete_step['step-3']; ?>" id="gmc-account" data-id="step_3">
 						          <div class="stepleftround">
 						            <img src="<?php echo ENHANCAD_PLUGIN_URL.'/admin/images/check-wbg.png'; ?>" alt="" />
@@ -726,6 +785,20 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
 			      $("#"+tracking_option).slideDown();
 			      //is_validate_step("step_1");
 	        }
+	        var ua_page =2;
+	        var ga4_page =2;
+	        $('.tvc-ua-option-more').click(function(event){
+					  //let tracking_option = $('input[type=radio][name=analytic_tag_type]:checked').val();
+					  call_list_analytics_web_properties("UA", tvc_data, ua_page); 
+					   ua_page++;
+					  event.stopPropagation();
+					})
+					$('.tvc-ga4-option-more').click(function(event){
+					  //let tracking_option = $('input[type=radio][name=analytic_tag_type]:checked').val();
+					  call_list_analytics_web_properties("GA4", tvc_data, ga4_page); 
+					   ga4_page++;
+					  event.stopPropagation();
+					})
 
 		      $("input[type=radio][name=analytic_tag_type]").on( "change", function() {
 		      	let tracking_option = this.value;
@@ -794,7 +867,7 @@ if ( ! class_exists( 'Conversios_Onboarding' ) ) {
           var conversios_onboarding_nonce = $("#conversios_onboarding_nonce").val();
           var tracking_option = $('input[type=radio][name=analytic_tag_type]:checked').val();
           var view_id = "";
-          add_message("warning","Process to save your settings. Do not refresh..",false);
+          add_message("warning","Processing... Do not refresh.",false);
           if(tracking_option == "UA"){
           	ga_view_id = $("#ua_web_property_id").find(':selected').data('profileid');
           }else{

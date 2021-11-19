@@ -46,7 +46,7 @@ class TVC_Ajax_File extends TVC_Ajax_Calls {
     // barch size for inser data in DB
     $product_db_batch_size = 100;
     // barch size for inser product in GMC
-    $product_batch_size = 100;
+    $product_batch_size = 50;
     if(!class_exists('CustomApi')){
       include(ENHANCAD_PLUGIN_DIR . 'includes/setup/CustomApi.php');
     }
