@@ -1,0 +1,17 @@
+{#
+  Title: Map
+  Description: Shows a map of the location found in the site settings
+  Category: formatting
+  Icon: admin-site-alt
+  Keywords: map
+  Mode: edit
+  SupportsAlign: center
+  SupportsMode: false
+  SupportsMultiple: false
+#}
+
+<div class="container relative flex bg-gray-100">
+
+  <iframe data-src="{{ options.map_code }}" width="100%" height="450" style="border:0;" allowfullscreen="" class="lazyload" loading="lazy"></iframe>
+
+</div>
