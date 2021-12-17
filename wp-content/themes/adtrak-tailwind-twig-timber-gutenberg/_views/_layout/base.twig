@@ -6,22 +6,18 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta
 		name="viewport" content="width=device-width, initial-scale=1">
-		{# <title>{{ site.title }}</title> #}
 
 		{% block htmlheader %}
 			<style>
 				{{source("/dist/main.min.css")}}</style>
 		{% endblock %}
 
-		{% if options.google_analytics %}
-			{{ options.google_analytics}}
-		{% endif %}
+		{{ options.google_analytics ? options.google_analytics }}
 
-		{% if options.schema %}
-			{{ options.schema}}
-		{% endif %}
+		{{ options.schema ? options.schema }}
 
 		{{ function('wp_head') }}
+		
 	</head>
 
 	<body>
@@ -73,9 +69,9 @@
 			{% endblock %}
 
 		</div>
-		<!-- wrapper -->
 
 		{{ function('wp_footer') }}
+
 	</body>
 
 </html>

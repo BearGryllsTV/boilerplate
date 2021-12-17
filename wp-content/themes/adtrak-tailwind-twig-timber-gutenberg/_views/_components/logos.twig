@@ -1,17 +1,13 @@
-	{{ showTitle ? '<h3 class="text-center">' ~ options.logos_header ~ '</h3>' }}
+{% if options.logos %}
 
-	<div class="flex flex-wrap justify-center p-8 lg:justify-around">
+	<div class="flex flex-wrap justify-center gap-2 p-8 lg:justify-around {{ containerClasses }}">
 
-		{% if options.logos %}
-			{% for logo in options.logos %}
+		{% for logo in options.logos %}
 
-				<img
-					class="self-center inline-block h-auto m-2 lazyload max-h-16"
-					data-src="{{ logo.image.url|letterbox('400', '200', '#fff') }}"
-					alt="{{ logo.name }} Logo"
-				/>
+			<img class="self-center h-auto lazyload max-h-16 {{ imgClasses }}" data-src="{{ logo.url|letterbox('400', '200', '#ccc')|towebp }}" alt="{{ logo.name }} Logo"/>
 
-			{% endfor %}
-		{% endif %}
+		{% endfor %}
 
 	</div>
+
+{% endif %}

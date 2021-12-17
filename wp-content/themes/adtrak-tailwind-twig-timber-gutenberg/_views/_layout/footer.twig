@@ -23,14 +23,14 @@
 			<p>Address:
 				{{ function('address_stacked') }}</p>
 			<p>Email:
-				<a href="mailto:{{options.site_email}}">{{options.site_email}}</a>
+				<a href="mailto:{{options.site_email_address}}">{{options.site_email_address}}</a>
 			</p>
 			<p>{{site.title}}
 				is a registered company in England.</p>
 
-			{% if options.reg_number %}
+			{% if options.registered_number %}
 				<p>Registered Number:
-					{{options.reg_number}}</p>
+					{{options.registered_number}}</p>
 			{% endif %}
 
 			{% if options.vat_number %}

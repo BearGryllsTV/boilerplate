@@ -1,5 +1,7 @@
 <?php 
 
+// See: https://palmiak.github.io/timber-acf-wp-blocks/#/
+
 // Using ACF Gutenberg Blocks package, look in this folder
 
 add_filter( 'timber/acf-gutenberg-blocks-templates', function () {
@@ -48,13 +50,14 @@ add_filter( 'timber/acf-gutenberg-blocks-data/hero', function( $context ){
 } );
 
 // Add default parameters to blocks
+// Commented out until tested further
 
-add_filter( 'timber/acf-gutenberg-blocks-default-data', function( $data ){
-  $data['default'] = array(
-      'post_type' => ['post','page'],
-  );
-  $data['pages'] = array(
-      'post_type' => 'page',
-  );
-  return $data;
-} );
+// add_filter( 'timber/acf-gutenberg-blocks-default-data', function( $data ){
+//   $data['default'] = array(
+//       'post_type' => ['post','page'],
+//   );
+//   $data['pages'] = array(
+//       'post_type' => 'page',
+//   );
+//   return $data;
+// } );

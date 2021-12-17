@@ -4,7 +4,7 @@ Typography
 
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/wp-content/themes/adtrak-tailwind-twig-timber/_assets/fonts/SourceSansPro-Regular.ttf")
+  src: url("/wp-content/themes/adtrak-tailwind-twig-timber-gutenberg/_assets/fonts/SourceSansPro-Regular.ttf")
     format("truetype");
   font-display: swap;
   font-weight: 300;
@@ -13,7 +13,7 @@ Typography
 
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/wp-content/themes/adtrak-tailwind-twig-timber/_assets/fonts/SourceSansPro-Bold.ttf")
+  src: url("/wp-content/themes/adtrak-tailwind-twig-timber-gutenberg/_assets/fonts/SourceSansPro-Bold.ttf")
     format("truetype");
   font-display: swap;
   font-weight: 700;
