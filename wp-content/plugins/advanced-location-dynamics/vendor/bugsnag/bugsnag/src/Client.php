@@ -6,13 +6,12 @@ use Bugsnag\Breadcrumbs\Breadcrumb;
 use Bugsnag\Breadcrumbs\Recorder;
 use Bugsnag\Callbacks\GlobalMetaData;
 use Bugsnag\Callbacks\RequestContext;
+use Bugsnag\Callbacks\RequestCookies;
 use Bugsnag\Callbacks\RequestMetaData;
 use Bugsnag\Callbacks\RequestSession;
 use Bugsnag\Callbacks\RequestUser;
-use Bugsnag\Internal\GuzzleCompat;
 use Bugsnag\Middleware\BreadcrumbData;
 use Bugsnag\Middleware\CallbackBridge;
-use Bugsnag\Middleware\DiscardClasses;
 use Bugsnag\Middleware\NotificationSkipper;
 use Bugsnag\Middleware\SessionData;
 use Bugsnag\Request\BasicResolver;
@@ -20,18 +19,17 @@ use Bugsnag\Request\ResolverInterface;
 use Bugsnag\Shutdown\PhpShutdownStrategy;
 use Bugsnag\Shutdown\ShutdownStrategyInterface;
 use Composer\CaBundle\CaBundle;
-use GuzzleHttp;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\ClientInterface;
 
 class Client
 {
     /**
-     * The default event notification endpoint.
+     * The default endpoint.
      *
      * @var string
-     *
-     * @deprecated Use {@see Configuration::NOTIFY_ENDPOINT} instead.
      */
-    const ENDPOINT = Configuration::NOTIFY_ENDPOINT;
+    const ENDPOINT = 'https://notify.bugsnag.com';
 
     /**
      * The config instance.
@@ -76,34 +74,23 @@ class Client
     protected $sessionTracker;
 
     /**
-     * Default HTTP timeout, in seconds.
-     *
-     * @internal
-     *
-     * @var float
-     */
-    const DEFAULT_TIMEOUT_S = 15.0;
-
-    /**
      * Make a new client instance.
      *
      * If you don't pass in a key, we'll try to read it from the env variables.
      *
-     * @param string|null $apiKey         your bugsnag api key
-     * @param string|null $notifyEndpoint your bugsnag notify endpoint
-     * @param bool        $defaults       if we should register our default callbacks
+     * @param string|null $apiKey   your bugsnag api key
+     * @param string|null $endpoint your bugsnag endpoint
+     * @param bool        $default  if we should register our default callbacks
      *
      * @return static
      */
-    public static function make(
-        $apiKey = null,
-        $notifyEndpoint = null,
-        $defaults = true
-    ) {
+    public static function make($apiKey = null, $endpoint = null, $defaults = true)
+    {
+        // Retrieves environment variables
         $env = new Env();
 
         $config = new Configuration($apiKey ?: $env->get('BUGSNAG_API_KEY'));
-        $guzzle = static::makeGuzzle($notifyEndpoint ?: $env->get('BUGSNAG_ENDPOINT'));
+        $guzzle = static::makeGuzzle($endpoint ?: $env->get('BUGSNAG_ENDPOINT'));
 
         $client = new static($config, null, $guzzle);
 
@@ -115,30 +102,25 @@ class Client
     }
 
     /**
-     * @param \Bugsnag\Configuration $config
-     * @param \Bugsnag\Request\ResolverInterface|null $resolver
-     * @param \GuzzleHttp\ClientInterface|null $guzzle
-     * @param \Bugsnag\Shutdown\ShutdownStrategyInterface|null $shutdownStrategy
+     * Create a new client instance.
+     *
+     * @param \Bugsnag\Configuration                            $config
+     * @param \Bugsnag\Request\ResolverInterface|null           $resolver
+     * @param \GuzzleHttp\ClientInterface|null                  $guzzle
+     * @param \Bugsnag\Shutdown\ShutdownStrategyInterface|null  $shutdownStrategy
+     *
+     * @return void
      */
-    public function __construct(
-        Configuration $config,
-        ResolverInterface $resolver = null,
-        GuzzleHttp\ClientInterface $guzzle = null,
-        ShutdownStrategyInterface $shutdownStrategy = null
-    ) {
-        $guzzle = $guzzle ?: self::makeGuzzle();
-
-        $this->syncNotifyEndpointWithGuzzleBaseUri($config, $guzzle);
-
+    public function __construct(Configuration $config, ResolverInterface $resolver = null, ClientInterface $guzzle = null, ShutdownStrategyInterface $shutdownStrategy = null)
+    {
         $this->config = $config;
         $this->resolver = $resolver ?: new BasicResolver();
         $this->recorder = new Recorder();
         $this->pipeline = new Pipeline();
-        $this->http = new HttpClient($config, $guzzle);
-        $this->sessionTracker = new SessionTracker($config, $this->http);
+        $this->http = new HttpClient($config, $guzzle ?: static::makeGuzzle());
+        $this->sessionTracker = new SessionTracker($config);
 
         $this->registerMiddleware(new NotificationSkipper($config));
-        $this->registerMiddleware(new DiscardClasses($config));
         $this->registerMiddleware(new BreadcrumbData($this->recorder));
         $this->registerMiddleware(new SessionData($this));
 
@@ -153,65 +135,19 @@ class Client
      * @param string|null $base
      * @param array       $options
      *
-     * @return GuzzleHttp\ClientInterface
+     * @return \GuzzleHttp\ClientInterface
      */
     public static function makeGuzzle($base = null, array $options = [])
     {
-        $options = self::resolveGuzzleOptions($base, $options);
+        $key = method_exists(ClientInterface::class, 'request') ? 'base_uri' : 'base_url';
 
-        return new GuzzleHttp\Client($options);
-    }
+        $options[$key] = $base ?: static::ENDPOINT;
 
-    /**
-     * @param string|null $base
-     * @param array $options
-     *
-     * @return array
-     */
-    private static function resolveGuzzleOptions($base, array $options)
-    {
-        $key = GuzzleCompat::getBaseUriOptionName();
-        $options[$key] = $base ?: Configuration::NOTIFY_ENDPOINT;
-
-        $path = static::getCaBundlePath();
-
-        if ($path) {
+        if ($path = static::getCaBundlePath()) {
             $options['verify'] = $path;
         }
 
-        return GuzzleCompat::applyRequestOptions(
-            $options,
-            [
-                'timeout' => self::DEFAULT_TIMEOUT_S,
-                'connect_timeout' => self::DEFAULT_TIMEOUT_S,
-            ]
-        );
-    }
-
-    /**
-     * Ensure the notify endpoint is synchronised with Guzzle's base URL.
-     *
-     * @param \Bugsnag\Configuration $configuration
-     * @param \GuzzleHttp\ClientInterface $guzzle
-     *
-     * @return void
-     */
-    private function syncNotifyEndpointWithGuzzleBaseUri(
-        Configuration $configuration,
-        GuzzleHttp\ClientInterface $guzzle
-    ) {
-        // Don't change the endpoint if one is already set, otherwise we could be
-        // resetting it back to the default as the Guzzle base URL will always
-        // be set by 'makeGuzzle'.
-        if ($configuration->getNotifyEndpoint() !== Configuration::NOTIFY_ENDPOINT) {
-            return;
-        }
-
-        $base = GuzzleCompat::getBaseUri($guzzle);
-
-        if (is_string($base) || (is_object($base) && method_exists($base, '__toString'))) {
-            $configuration->setNotifyEndpoint((string) $base);
-        }
+        return new GuzzleClient($options);
     }
 
     /**
@@ -271,6 +207,7 @@ class Client
     {
         $this->registerCallback(new GlobalMetaData($this->config))
              ->registerCallback(new RequestMetaData($this->resolver))
+             ->registerCallback(new RequestCookies($this->resolver))
              ->registerCallback(new RequestSession($this->resolver))
              ->registerCallback(new RequestUser($this->resolver))
              ->registerCallback(new RequestContext($this->resolver));
@@ -389,13 +326,13 @@ class Client
     /**
      * Notify Bugsnag of a deployment.
      *
+     * @deprecated This function is being deprecated in favour of `build`.
+     *
      * @param string|null $repository the repository from which you are deploying the code
      * @param string|null $branch     the source control branch from which you are deploying
      * @param string|null $revision   the source control revision you are currently deploying
      *
      * @return void
-     *
-     * @deprecated Use {@see Client::build} instead.
      */
     public function deploy($repository = null, $branch = null, $revision = null)
     {
@@ -442,7 +379,7 @@ class Client
      */
     public function flush()
     {
-        $this->http->sendEvents();
+        $this->http->send();
     }
 
     /**
@@ -532,8 +469,6 @@ class Client
      *
      * Eg. ['password', 'credit_card'].
      *
-     * @deprecated Use redactedKeys instead
-     *
      * @param string[] $filters an array of metaData filters
      *
      * @return $this
@@ -548,9 +483,7 @@ class Client
     /**
      * Get the array of metaData filters.
      *
-     * @deprecated Use redactedKeys instead
-     *
-     * @var string[]
+     * @var string
      */
     public function getFilters()
     {
@@ -835,79 +768,7 @@ class Client
     }
 
     /**
-     * Set notification delivery endpoint.
-     *
-     * @param string $endpoint
-     *
-     * @return $this
-     */
-    public function setNotifyEndpoint($endpoint)
-    {
-        $this->config->setNotifyEndpoint($endpoint);
-
-        return $this;
-    }
-
-    /**
-     * Get notification delivery endpoint.
-     *
-     * @return string
-     */
-    public function getNotifyEndpoint()
-    {
-        return $this->config->getNotifyEndpoint();
-    }
-
-    /**
-     * Set session delivery endpoint.
-     *
-     * @param string $endpoint
-     *
-     * @return $this
-     */
-    public function setSessionEndpoint($endpoint)
-    {
-        $this->config->setSessionEndpoint($endpoint);
-
-        return $this;
-    }
-
-    /**
-     * Get session delivery endpoint.
-     *
-     * @return string
-     */
-    public function getSessionEndpoint()
-    {
-        return $this->config->getSessionEndpoint();
-    }
-
-    /**
-     * Set the build endpoint.
-     *
-     * @param string $endpoint the build endpoint
-     *
-     * @return $this
-     */
-    public function setBuildEndpoint($endpoint)
-    {
-        $this->config->setBuildEndpoint($endpoint);
-
-        return $this;
-    }
-
-    /**
-     * Get the build endpoint.
-     *
-     * @return string
-     */
-    public function getBuildEndpoint()
-    {
-        return $this->config->getBuildEndpoint();
-    }
-
-    /**
-     * Set session tracking state.
+     * Set session tracking state and pass in optional guzzle.
      *
      * @param bool $track whether to track sessions
      *
@@ -921,6 +782,30 @@ class Client
     }
 
     /**
+     * Set session delivery endpoint.
+     *
+     * @param string $endpoint the session endpoint
+     *
+     * @return $this
+     */
+    public function setSessionEndpoint($endpoint)
+    {
+        $this->config->setSessionEndpoint($endpoint);
+
+        return $this;
+    }
+
+    /**
+     * Get the session client.
+     *
+     * @return \GuzzleHttp\ClientInterface
+     */
+    public function getSessionClient()
+    {
+        return $this->config->getSessionClient();
+    }
+
+    /**
      * Whether should be auto-capturing sessions.
      *
      * @return bool
@@ -931,88 +816,26 @@ class Client
     }
 
     /**
-     * Get the session client.
+     * Sets the build endpoint.
      *
-     * @return \GuzzleHttp\ClientInterface
-     *
-     * @deprecated This will be removed in the next major version.
-     */
-    public function getSessionClient()
-    {
-        return $this->config->getSessionClient();
-    }
-
-    /**
-     * Set the amount to increase the memory_limit when an OOM is triggered.
-     *
-     * This is an amount of bytes or 'null' to disable increasing the limit.
-     *
-     * @param int|null $value
-     */
-    public function setMemoryLimitIncrease($value)
-    {
-        return $this->config->setMemoryLimitIncrease($value);
-    }
-
-    /**
-     * Get the amount to increase the memory_limit when an OOM is triggered.
-     *
-     * This will return 'null' if this feature is disabled.
-     *
-     * @return int|null
-     */
-    public function getMemoryLimitIncrease()
-    {
-        return $this->config->getMemoryLimitIncrease();
-    }
-
-    /**
-     * Set the array of classes that should not be sent to Bugsnag.
-     *
-     * @param array $discardClasses
+     * @param string $endpoint the build endpoint
      *
      * @return $this
      */
-    public function setDiscardClasses(array $discardClasses)
+    public function setBuildEndpoint($endpoint)
     {
-        $this->config->setDiscardClasses($discardClasses);
+        $this->config->setBuildEndpoint($endpoint);
 
         return $this;
     }
 
     /**
-     * Get the array of classes that should not be sent to Bugsnag.
+     * Returns the build endpoint.
      *
-     * This can contain both fully qualified class names and regular expressions.
-     *
-     * @var array
+     * @return string
      */
-    public function getDiscardClasses()
+    public function getBuildEndpoint()
     {
-        return $this->config->getDiscardClasses();
-    }
-
-    /**
-     * Set the array of metadata keys that should be redacted.
-     *
-     * @param string[] $redactedKeys
-     *
-     * @return $this
-     */
-    public function setRedactedKeys(array $redactedKeys)
-    {
-        $this->config->setRedactedKeys($redactedKeys);
-
-        return $this;
-    }
-
-    /**
-     * Get the array of metadata keys that should be redacted.
-     *
-     * @var string[]
-     */
-    public function getRedactedKeys()
-    {
-        return $this->config->getRedactedKeys();
+        return $this->config->getBuildEndpoint();
     }
 }

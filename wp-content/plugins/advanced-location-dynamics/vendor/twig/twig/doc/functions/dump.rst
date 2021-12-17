@@ -2,7 +2,6 @@
 ========
 
 .. versionadded:: 1.5
-
     The ``dump`` function was added in Twig 1.5.
 
 The ``dump`` function dumps information about a template variable. This is
@@ -32,7 +31,7 @@ introspecting its variables:
 In an HTML context, wrap the output with a ``pre`` tag to make it easier to
 read:
 
-.. code-block:: html+twig
+.. code-block:: twig
 
     <pre>
         {{ dump(user) }}
@@ -67,4 +66,4 @@ Arguments
 * ``context``: The context to dump
 
 .. _`XDebug`:   https://xdebug.org/docs/display
-.. _`var_dump`: https://www.php.net/var_dump
+.. _`var_dump`: https://secure.php.net/var_dump

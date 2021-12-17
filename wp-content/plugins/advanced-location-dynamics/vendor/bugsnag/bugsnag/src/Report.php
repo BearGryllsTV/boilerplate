@@ -3,7 +3,6 @@
 namespace Bugsnag;
 
 use Bugsnag\Breadcrumbs\Breadcrumb;
-use Bugsnag\DateTime\Date;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
@@ -11,16 +10,16 @@ use Throwable;
 class Report
 {
     /**
-     * The payload version for the error notification API.
+     * The payload version.
      *
-     * @deprecated Use {HttpClient::NOTIFY_PAYLOAD_VERSION} instead.
+     * @var string
      */
-    const PAYLOAD_VERSION = HttpClient::NOTIFY_PAYLOAD_VERSION;
+    const PAYLOAD_VERSION = HttpClient::PAYLOAD_VERSION;
 
     /**
      * The config object.
      *
-     * @var \Bugsnag\Configuration
+     * @var \Bugsnag\Config
      */
     protected $config;
 
@@ -205,7 +204,7 @@ class Report
     protected function __construct(Configuration $config)
     {
         $this->config = $config;
-        $this->time = Date::now();
+        $this->time = gmdate('Y-m-d\TH:i:s\Z');
     }
 
     /**
@@ -387,7 +386,7 @@ class Report
      */
     public function setName($name)
     {
-        if (is_scalar($name) || (is_object($name) && method_exists($name, '__toString'))) {
+        if (is_scalar($name) || method_exists($name, '__toString')) {
             $this->name = (string) $name;
         } else {
             throw new InvalidArgumentException('The name must be a string.');
@@ -423,10 +422,7 @@ class Report
     {
         if ($message === null) {
             $this->message = null;
-        } elseif (
-            is_scalar($message)
-            || (is_object($message) && method_exists($message, '__toString'))
-        ) {
+        } elseif (is_scalar($message) || method_exists($message, '__toString')) {
             $this->message = (string) $message;
         } else {
             throw new InvalidArgumentException('The message must be a string.');
@@ -645,39 +641,6 @@ class Report
     }
 
     /**
-     * Get a list of all errors in a fixed format of:
-     * - 'errorClass'
-     * - 'errorMessage'
-     * - 'type' (always 'php').
-     *
-     * @return array
-     */
-    public function getErrors()
-    {
-        $errors = [$this->toError()];
-        $previous = $this->previous;
-
-        while ($previous) {
-            $errors[] = $previous->toError();
-            $previous = $previous->previous;
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @return array
-     */
-    private function toError()
-    {
-        return [
-            'errorClass' => $this->name,
-            'errorMessage' => $this->message,
-            'type' => 'php',
-        ];
-    }
-
-    /**
      * Get the array representation.
      *
      * @return array
@@ -689,7 +652,7 @@ class Report
             'device' => array_merge(['time' => $this->time], $this->config->getDeviceData()),
             'user' => $this->getUser(),
             'context' => $this->getContext(),
-            'payloadVersion' => HttpClient::NOTIFY_PAYLOAD_VERSION,
+            'payloadVersion' => HttpClient::PAYLOAD_VERSION,
             'severity' => $this->getSeverity(),
             'exceptions' => $this->exceptionArray(),
             'breadcrumbs' => $this->breadcrumbs,
@@ -785,21 +748,11 @@ class Report
      */
     protected function shouldFilter($key, $isMetaData)
     {
-        if (!$isMetaData) {
-            return false;
-        }
-
-        foreach ($this->config->getFilters() as $filter) {
-            if (stripos($key, $filter) !== false) {
-                return true;
-            }
-        }
-
-        foreach ($this->config->getRedactedKeys() as $redactedKey) {
-            if (@preg_match($redactedKey, $key) === 1) {
-                return true;
-            } elseif (Utils::stringCaseEquals($redactedKey, $key)) {
-                return true;
+        if ($isMetaData) {
+            foreach ($this->config->getFilters() as $filter) {
+                if (strpos($key, $filter) !== false) {
+                    return true;
+                }
             }
         }
 

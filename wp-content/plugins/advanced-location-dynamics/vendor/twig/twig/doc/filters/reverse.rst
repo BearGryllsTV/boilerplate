@@ -2,7 +2,6 @@
 ===========
 
 .. versionadded:: 1.6
-
     Support for strings has been added in Twig 1.6.
 
 The ``reverse`` filter reverses a sequence, a mapping, or a string:
@@ -45,4 +44,4 @@ Arguments
 
 * ``preserve_keys``: Preserve keys when reversing a mapping or a sequence.
 
-.. _`Traversable`: https://www.php.net/Traversable
+.. _`Traversable`: https://secure.php.net/Traversable

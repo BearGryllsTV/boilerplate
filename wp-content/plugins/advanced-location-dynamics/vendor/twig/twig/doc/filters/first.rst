@@ -2,7 +2,6 @@
 =========
 
 .. versionadded:: 1.12.2
-
     The ``first`` filter was added in Twig 1.12.2.
 
 The ``first`` filter returns the first "element" of a sequence, a mapping, or
@@ -23,4 +22,4 @@ a string:
 
     It also works with objects implementing the `Traversable`_ interface.
 
-.. _`Traversable`: https://www.php.net/manual/en/class.traversable.php
+.. _`Traversable`: https://secure.php.net/manual/en/class.traversable.php
