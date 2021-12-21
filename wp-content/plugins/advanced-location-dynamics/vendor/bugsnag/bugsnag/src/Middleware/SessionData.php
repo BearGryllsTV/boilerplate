@@ -4,58 +4,46 @@ namespace Bugsnag\Middleware;
 
 use Bugsnag\Client;
 use Bugsnag\Report;
-use Bugsnag\SessionTracker;
 
 class SessionData
 {
     /**
-     * @var \Bugsnag\Client
+     * The client instance.
      *
-     * @deprecated This will be removed in the next major version.
-     *             The constructor parameter will also change to {@see SessionTracker}
+     * @var \Bugsnag\Client
      */
     protected $client;
 
     /**
-     * @var \Bugsnag\SessionTracker
-     */
-    private $sessionTracker;
-
-    /**
-     * @param \Bugsnag\Client $client
+     * Create a new session data middleware instance.
+     *
+     * @param \Bugsnag\Client $client the client instance.
+     *
+     * @return void
      */
     public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->sessionTracker = $client->getSessionTracker();
     }
 
     /**
-     * Attaches session information to the Report, if the SessionTracker has a
-     * current session. Note that this is not the same as the PHP session, but
-     * refers to the current request.
+     * Execute the session data middleware.
      *
-     * If the SessionTracker does not have a current session, the report will
-     * not be changed.
-     *
-     * @param \Bugsnag\Report $report
-     * @param callable $next
+     * @param \Bugsnag\Report $report the bugsnag report instance
+     * @param callable        $next   the next stage callback
      *
      * @return void
      */
     public function __invoke(Report $report, callable $next)
     {
-        $session = $this->sessionTracker->getCurrentSession();
-
-        if (isset($session['events'])) {
+        $session = $this->client->getSessionTracker()->getCurrentSession();
+        if (!is_null($session) && isset($session['events'])) {
             if ($report->getUnhandled()) {
                 $session['events']['unhandled'] += 1;
             } else {
                 $session['events']['handled'] += 1;
             }
-
             $report->setSessionData($session);
-            $this->sessionTracker->setCurrentSession($session);
         }
 
         $next($report);

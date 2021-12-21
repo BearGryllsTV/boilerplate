@@ -2,7 +2,6 @@
 ===============
 
 .. versionadded:: 1.9.0
-
     The date_modify filter has been added in Twig 1.9.0.
 
 The ``date_modify`` filter modifies a date with a given modifier string:
@@ -20,5 +19,5 @@ Arguments
 
 * ``modifier``: The modifier
 
-.. _`strtotime`: https://www.php.net/strtotime
-.. _`DateTime`:  https://www.php.net/DateTime
+.. _`strtotime`: https://secure.php.net/strtotime
+.. _`DateTime`:  https://secure.php.net/DateTime

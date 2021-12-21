@@ -24,7 +24,7 @@
 
 ## Theme Setup
 
-### Adtrak Theme with Tailwind, Twig & Timber
+### Adtrak Themes ([Tailwind, Twig/Timber], [Gutenberg, Tailwind, Twig/Timber])
 
 1. Create a new repository on gitlab (lowercase/hyphenated) and clone it to your local machine (```git clone [REPO URL] [FOLDER NAME]```)
 2. Download latest release of WordPress [https://wordpress.org/latest.zip](https://wordpress.org/latest.zip) 
@@ -53,6 +53,8 @@
 23. Run ```npm run dev``` or ```gulp```
 24. ```npm run dev``` will run the ```development``` tasks, and won't minify your SCSS nor Javascript
 1. Go to [WordPress Settings](#wordpress-settings)
+
+For the Gutenberg directions, see the README inside the theme.
 
 #### Theme Structure ####
 

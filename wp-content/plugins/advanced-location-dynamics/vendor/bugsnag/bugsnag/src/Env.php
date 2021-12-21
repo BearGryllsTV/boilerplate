@@ -12,9 +12,9 @@ class Env
      * Copied from phpdotenv: https://github.com/vlucas/phpdotenv/blob/2.6/src/Loader.php#L291. BSD 3-Clause license
      * provided at this bottom of this file.
      *
-     * @param string $name
+     * @param $name
      *
-     * @return mixed
+     * @return array|false|mixed|string|null
      */
     public function get($name)
     {

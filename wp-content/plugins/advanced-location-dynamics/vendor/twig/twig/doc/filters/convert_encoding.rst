@@ -2,7 +2,6 @@
 ====================
 
 .. versionadded:: 1.4
-
     The ``convert_encoding`` filter was added in Twig 1.4.
 
 The ``convert_encoding`` filter converts a string from one encoding to
@@ -25,5 +24,5 @@ Arguments
 * ``to``:   The output charset
 * ``from``: The input charset
 
-.. _`iconv`:    https://www.php.net/iconv
-.. _`mbstring`: https://www.php.net/mbstring
+.. _`iconv`:    https://secure.php.net/iconv
+.. _`mbstring`: https://secure.php.net/mbstring
