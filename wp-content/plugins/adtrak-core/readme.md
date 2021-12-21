@@ -1,10 +1,10 @@
 === Adtrak Core ===
 
-Contributors: jackabox
+Contributors: jackabox, zellement
 Tags: core, functionality, acf  
 Requires at least: 4.6.0  
 Tested up to: 4.8.1  
-Stable tag: 0.9.20  
+Stable tag: 0.10.1  
 License: GPLv2 or later  
 License URI: http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -20,6 +20,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 == Frequently Asked Questions ==
 
 == Changelog ==
+= 0.10.1 =
+- [Bug] Remove admin styles, retain login styles
+
 = 0.9.20 =
 - [Bug] Fixes a minor bug with WooCommerce
 
