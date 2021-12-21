@@ -1,4 +1,4 @@
-# WD Boilerplate
+# Web Design Boilerplate
 
 ## Contents
 1. [Prerequisites](#prerequisites)
@@ -7,8 +7,8 @@
     1. [Adtrak Theme with Woocommerce](#adtrak-theme-with-woocommerce)
 1. [WordPress Settings](#wordpress-settings)
 1. [Useful Commands](#useful-commands)
-1. [TailwindCSS](#tailwindcss)
-    1. [Purge](#purge)
+1. [Tailwind CSS](#tailwindcss)
+    1. [Purge / Just-in-Time Mode](#purge-just-in-time-mode)
     1. [CriticalCSS](#criticalcss)
     1. [Defaults](#defaults)
 1. [Before Deployment](#before-deployment)
@@ -114,7 +114,7 @@ wp-content/themes/your-theme-name/node_modules/**
 ```
 
 
-## TailwindCSS
+## Tailwind CSS
 
 We have created a [Tailwind](https://tailwindcss.com/docs/installation/) config file that is easily editable in ```tailwind.config.js```. If you need to add colours, fonts etc., they can be added or edited in this file.
 
@@ -131,11 +131,11 @@ Feel free to add your own extensions.
 
 You can also use [Tailwind colour generators](https://tailwind.simeongriggs.dev/) to override standard colours. Using this, for example, means you override ```text-red-500``` with your own hex colour of red, instead of using Tailwind's.
 
-### Purge ###
+### Purge / Just-in-Time Mode ###
 
-The ```tailwind-twig-timber``` boilerplate uses Tailwind's in-built Purge - this can be found in your ```tailwind.config``` file.
+All boilerplates have Just-in-Time mode enabled and so CSS is generated on-demand. If you are injecting classes with JS or via WordPress admin, add your class to the safelist.txt and restart your local development server.
 
-### CriticalCSS
+### Critical CSS
 
 Due to the minified and purged size of Tailwind, we can inline our CSS completely using the Twig ```source``` function. The new ```head.twig``` import checks the URL - if its a local URL, it uses a normal stylesheet link. If not, it inlines all your CSS in the head.
 
