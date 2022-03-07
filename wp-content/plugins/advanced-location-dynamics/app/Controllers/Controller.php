@@ -39,7 +39,7 @@ class Controller
     public function checkForAdvancedCookie()
     {
         if (!is_admin()) {
-            if ((isset($_COOKIE['area']) && is_numeric($_COOKIE['area'])) || isset($_GET['physical_loc']) || isset($_GET['interest_loc'])) {
+            if ((isset($_COOKIE['area']) && is_numeric($_COOKIE['area'])) || (isset($_GET['physical_loc']) && $_GET['physical_loc'] != '') || (isset($_GET['interest_loc']) && $_GET['interest_loc'] != '')) {
                 return true;
             } else {
                 return false;
