@@ -17,10 +17,8 @@
     {{ options.google_analytics}}
   {% endif %}
 
-  {% if options.schema %}
-    {{ options.schema}}
-  {% endif %}
-
+  {% include "_layout/schema.twig" %}
+  
   {{ function('wp_head') }}
 </head>
 
