@@ -17,9 +17,7 @@
     {{ options.google_analytics}}
     {% endif %}
 
-    {% if options.schema %}
-    {{ options.schema}}
-    {% endif %}
+    {% include "_layout/schema.twig" %}
 
     {# <link rel="stylesheet" href="{{ site.theme.link }}/dist/main.min.css" type="text/css" media="screen" /> #}
     {# <script src="{{ site.theme.link }}/dist/production-dist.js" defer></script> #}
