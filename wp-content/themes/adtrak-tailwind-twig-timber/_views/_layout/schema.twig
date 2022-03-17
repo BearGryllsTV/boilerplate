@@ -41,7 +41,7 @@
             ],
             "opens": "00:00",
             "closes": "23:59"
-        } 
+        },
     {% else %}
         {% if options.schema_opening_hours %}
             "openingHoursSpecification": [
@@ -57,7 +57,7 @@
                         "closes": "{{ item.closing_time }}"
                     }{{ loop.last == false ? ',' }}
                 {% endfor %}
-            ]
+            ],
         {% endif %}
     {% endif %}
     
