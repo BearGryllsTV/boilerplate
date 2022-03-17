@@ -26,14 +26,39 @@
     {% endif %}
     
     {% if options.schema_telephone %}"telephone" : "{{ options.schema_telephone }}",{% endif %}
-    
-    {% if options.schema_opening_hours %}
-    "openingHours":
-    [
-        {% for item in options.schema_opening_hours %}
-            "{{ item.openinghours }}"{{ loop.last == false ? ',' }}
-        {% endfor %}
-    ],
+
+    {% if options.schema_opening_24_hrs %}
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ],
+            "opens": "00:00",
+            "closes": "23:59"
+        } 
+    {% else %}
+        {% if options.schema_opening_hours %}
+            "openingHoursSpecification": [
+                {% for item in options.schema_opening_hours %}
+                    {
+                        "@type": "OpeningHoursSpecification",
+                        "dayOfWeek": [
+                        {% for day in item.days %}
+                            "{{day}}"{{ loop.last == false ? ',' }}
+                        {% endfor %}
+                        ],
+                        "opens": "{{ item.opening_time }}",
+                        "closes": "{{ item.closing_time }}"
+                    }{{ loop.last == false ? ',' }}
+                {% endfor %}
+            ]
+        {% endif %}
     {% endif %}
     
     {% if options.site_email_address %}"email" : "{{ options.site_email_address }}",{% endif %}

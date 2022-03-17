@@ -242,7 +242,15 @@ add_action('init', function() {
                     'type' => 'repeater',
                     'instructions' => '',
                     'required' => 0,
-                    'conditional_logic' => 0,
+                    'conditional_logic' => array(
+                        array(
+                            array(
+                                'field' => 'field_6232f4e96259f',
+                                'operator' => '!=',
+                                'value' => '1',
+                            ),
+                        ),
+                    ),
                     'wrapper' => array(
                         'width' => '',
                         'class' => '',
@@ -255,10 +263,10 @@ add_action('init', function() {
                     'button_label' => '',
                     'sub_fields' => array(
                         array(
-                            'key' => 'field_6228c6a6f5b4e',
-                            'label' => 'openingHours',
-                            'name' => 'openinghours',
-                            'type' => 'text',
+                            'key' => 'field_6232f29e2ef3d',
+                            'label' => 'Days',
+                            'name' => 'days',
+                            'type' => 'checkbox',
                             'instructions' => '',
                             'required' => 0,
                             'conditional_logic' => 0,
@@ -267,13 +275,75 @@ add_action('init', function() {
                                 'class' => '',
                                 'id' => '',
                             ),
-                            'default_value' => '',
-                            'placeholder' => '',
-                            'prepend' => '',
-                            'append' => '',
-                            'maxlength' => '',
+                            'choices' => array(
+                                'mon' => 'Monday',
+                                'tues' => 'Tuesday',
+                                'weds' => 'Wednesday',
+                                'thurs' => 'Thursday',
+                                'fri' => 'Friday',
+                                'sat' => 'Saturday',
+                                'sun' => 'Sunday',
+                            ),
+                            'allow_custom' => 0,
+                            'default_value' => array(
+                            ),
+                            'layout' => 'vertical',
+                            'toggle' => 0,
+                            'return_format' => 'label',
+                            'save_custom' => 0,
+                        ),
+                        array(
+                            'key' => 'field_6232f2e42ef3e',
+                            'label' => 'Opening Time',
+                            'name' => 'opening_time',
+                            'type' => 'time_picker',
+                            'instructions' => '24 hour clock, format 00:00',
+                            'required' => 0,
+                            'conditional_logic' => 0,
+                            'wrapper' => array(
+                                'width' => '',
+                                'class' => '',
+                                'id' => '',
+                            ),
+                            'display_format' => 'H:i',
+                            'return_format' => 'H:i',
+                        ),
+                        array(
+                            'key' => 'field_6232f3162ef3f',
+                            'label' => 'Closing Time',
+                            'name' => 'closing_time',
+                            'type' => 'time_picker',
+                            'instructions' => '24 hour clock, format 00:00',
+                            'required' => 0,
+                            'conditional_logic' => 0,
+                            'wrapper' => array(
+                                'width' => '',
+                                'class' => '',
+                                'id' => '',
+                            ),
+                            'display_format' => 'H:i',
+                            'return_format' => 'H:i',
                         ),
                     ),
+                ),
+                array(
+                    'key' => 'field_6232f4e96259f',
+                    'label' => 'Schema Opening 24 Hrs',
+                    'name' => 'schema_opening_24_hrs',
+                    'type' => 'true_false',
+                    'instructions' => '',
+                    'required' => 0,
+                    'conditional_logic' => 0,
+                    'wrapper' => array(
+                        'width' => '',
+                        'class' => '',
+                        'id' => '',
+                    ),
+                    'message' => '',
+                    'default_value' => 0,
+                    'ui' => 0,
+                    'ui_on_text' => '',
+                    'ui_off_text' => '',
                 ),
                 array(
                     'key' => 'field_6228c7b0f5b4f',
@@ -467,6 +537,7 @@ add_action('init', function() {
             'description' => '',
             'show_in_rest' => 0,
         ));
+        
 
         // Set up Site Options
 
