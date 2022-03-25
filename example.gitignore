@@ -19,6 +19,7 @@ wp-content/uploads/*
 # Don't ignore the gitignore or htaccess #
 !.gitignore
 !.htaccess
+!.env.ald
 
 # ignore OS generated files
 ehthumbs.db
