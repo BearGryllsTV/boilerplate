@@ -15,7 +15,7 @@ if($cookiePage != null) {
 ?>
 <div id="wp-notification" class="closed">
 	<div class="wp-notification-container">
-		<p>By clicking "Accept All Cookies", you agree to the storing of cookies on your device to enhance site navigation, analyse site usage, assist in our marketing efforts, and for personalised advertising.</p> 
+		<p>By clicking "Accept All Cookies", you agree to the storing of cookies on your device to enhance site navigation, analyse site usage, assist in our marketing efforts, and for personalised advertising.</p>
 		<div>
 			<a href="<?= site_url($url) ?>/">More Information</a>
 			<span id="wp-notification-toggle">Accept All Cookies</span>
