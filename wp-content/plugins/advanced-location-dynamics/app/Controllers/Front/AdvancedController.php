@@ -258,6 +258,7 @@ class AdvancedController extends Controller
 
             case ALD_DEFAULT:
                 $data['number'] = $this->numberFormatter($number, strlen($data['location']->area_code) + 1);
+                $data['pageTitle'] = get_the_title();
                 return View::render('front/ald/single.twig', $data);
                 break;
             

@@ -318,7 +318,7 @@ class LDController extends Controller
             case LD_SINGLE:
                 $number = $numbers->where('location_name', $data['location'])->first();
                 $data['number'] = $number;
-
+                $data['pageTitle'] = get_the_title();
                 return View::render('front/ld/single.twig', $data);
                 break;
 
@@ -330,6 +330,7 @@ class LDController extends Controller
                 }
 
                 $data['number'] = $number;
+                $data['pageTitle'] = get_the_title();
                 return View::render('front/ld/single.twig', $data);
                 break;
 

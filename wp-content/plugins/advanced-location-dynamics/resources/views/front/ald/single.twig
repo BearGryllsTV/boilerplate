@@ -4,6 +4,6 @@
         Call {{ location.location }} on
     {% endif %}
 
-    <a href="tel:{{ number }}" class="">{{ number }}</a>  
+    <a onClick='gtag("event" , "Click" , { "event_category" : "Phone Number", "event_label" : "Click Phone Number {{ number.location_label }} {{ pageTitle }}" });' href="tel:{{ number }}" class="">{{ number }}</a>  
 
 </span>
