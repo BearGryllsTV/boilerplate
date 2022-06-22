@@ -50,7 +50,7 @@ $closeTextBg: theme("colors.red.800");
 
   &--active {
     @apply transform translate-x-0;
-    box-shadow: -10px 0 30px rgba(#000, 0.2);
+    box-shadow: -10px 0 30px rgba(0,0,0, 0.2);
   }
 
   li {
@@ -156,9 +156,7 @@ $closeTextBg: theme("colors.red.800");
 
 .mob-nav-underlay {
   @apply fixed top-0 bottom-0 left-0 right-0 invisible w-full h-full opacity-0;
-  display: block !important;
-  /* override critical css */
-  background-color: rgba(#000, 0.4);
+  background-color: rgba(0,0,0, 0.4);
   z-index: 999999;
   transition: 0.3s;
 
