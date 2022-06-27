@@ -98,4 +98,4 @@ add_action('wp_head', function() {
 /**
  * Prevent theme edit
  */
-define( 'DISALLOW_FILE_EDIT', true );
+// define( 'DISALLOW_FILE_EDIT', true );
