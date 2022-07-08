@@ -61,7 +61,7 @@
         {% endif %}
     {% endif %}
     
-    {% if options.site_email_address %}"email" : "{{ options.site_email_address }}"{% if options.vat_number or options.schema_sameas or options.schema_description or options.schema_areas_served %},{% endif %}{% endif %}
+    {% if options.site_email %}"email" : "{{ options.site_email }}"{% if options.vat_number or options.schema_sameas or options.schema_description or options.schema_areas_served %},{% endif %}{% endif %}
     
     {% if options.vat_number %}"vatID" : "{{ options.vat_number }}"{% if options.schema_sameas or options.schema_description or options.schema_areas_served %},{% endif %}{% endif %}
     
