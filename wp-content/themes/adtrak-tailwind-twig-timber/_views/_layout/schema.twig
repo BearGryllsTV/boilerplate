@@ -61,9 +61,9 @@
         {% endif %}
     {% endif %}
     
-    {% if options.site_email_address %}"email" : "{{ options.site_email_address }}",{% endif %}
+    {% if options.site_email_address %}"email" : "{{ options.site_email_address }}"{% if options.vat_number or options.schema_sameas or options.schema_description or options.schema_areas_served %},{% endif %}{% endif %}
     
-    {% if options.vat_number %}"vatID" : "{{ options.vat_number }}",{% endif %}
+    {% if options.vat_number %}"vatID" : "{{ options.vat_number }}"{% if options.schema_sameas or options.schema_description or options.schema_areas_served %},{% endif %}{% endif %}
     
     {% if options.schema_sameas %}
     "sameAs" :
@@ -71,10 +71,10 @@
         {% for item in options.schema_sameas %}
             "{{ item.sameas }}"{{ loop.last == false ? ',' }}
         {% endfor %}
-    ],
+    ]{% if options.schema_description or options.schema_areas_served %},{% endif %}
     {% endif %}
     
-    {% if options.schema_description %}"description" : "{{ options.schema_description }}",{% endif %}
+    {% if options.schema_description %}"description" : "{{ options.schema_description }}"{% if options.schema_areas_served %},{% endif %}{% endif %}
     
     {% if options.schema_areas_served %}
     "areaServed":
