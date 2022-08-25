@@ -98,7 +98,7 @@ Identify and resolve common issues:
 - [ ] Make sure that the mobile navigation isn't tab-indexable on desktop (Press the tab key from the top of the website and make sure that the tab cursor doesn't go off-canvas). 
 - [ ] Make sure buttons and links have descriptive labels (do not use 'Click here' for example)
 - [ ] Make sure links have :focus attributes
-- [ ] Images have `src` attributes (leave empty if lazyloading) and descriptive `alt` tags
+- [ ] Images have `src` attributes (leave empty if lazyloading) and descriptive `alt` tags and ensure these alt tags are pulled through
 - [ ] Ensure the heading elements are in hierarchical order (`h1` > `h2` > `h3` > `h4`) and do not skip levels.
 - [ ] Check that the site can be rotated into landscape mode on mobile devices and still looks/functions OK (tip: you can use the `lansdcape:` class to make landscape-specific adjustments)
 - [ ] Rerun a lighthouse test to check for improved score
