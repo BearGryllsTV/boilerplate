@@ -32,26 +32,27 @@
 4. Delete the ```wp-content``` folder from your new folder
 5. Download this boilerplate. Copy ```wp-content``` and ```example.gitignore``` to your folder
 6. Rename the theme folder
-6. Update ```style.css``` with your client name
-6. Update *screenshot.png* with the client's branding
-7. Rename ```example.gitignore``` to ```.gitignore``` and open the file
-8. Edit lines ```5```, ```6``` & ```7``` and replace the theme name to prevent ```node_modules```, ```dist``` and ```vendor``` files being committed 
-9. Create local database
-10. Open the Command Line / Terminal 
-11. Change Directory to the theme folder (```cd /[FOLDER NAME]/wp-content/themes/[YOUR NEW THEME NAME]```)
-12. Run ```npm install```
-13. Run ```composer install```
-14. Open ```gulpfile.js``` in the theme folder
-15. Edit line ~ ```174``` to the name of your local site. *(e.g. my-new-site.vm)*
-16. Save the ```gulpfile```
-17. Visit your new site in the browser and set up Wordpress **MAKE SURE YOU USE ```adtrakwp_``` AS YOUR TABLE PREFIX** (the ```wp-config``` file will be ignored by GIT)  
-18. You may need to edit the ```wp-config.php``` file to change charset. Add this line if this is the case: ```define( 'DB_CHARSET', 'utf8mb4' );```
-19. Log in and activate relevant plugins (except WooCoommerce plugins if you're site will not use them - delete these if so)
-20. Activate your theme through the WordPress admin console
-21. Delete the ```adtrak-skips``` folder from your theme if you are not using it
-22. Open the Command Line / Terminal and make sure you're in your theme folder
-23. Run ```npm run dev``` or ```gulp```
-24. ```npm run dev``` will run the ```development``` tasks, and won't minify your SCSS nor Javascript
+7. Move the ```robots.txt``` file from the repository download to the root of your WP install 
+8. Update ```style.css``` with your client name
+9. Update *screenshot.png* with the client's branding
+10. Rename ```example.gitignore``` to ```.gitignore``` and open the file
+11. Edit lines ```5```, ```6``` & ```7``` and replace the theme name to prevent ```node_modules```, ```dist``` and ```vendor``` files being committed 
+12. Create local database
+13. Open the Command Line / Terminal 
+14. Change Directory to the theme folder (```cd /[FOLDER NAME]/wp-content/themes/[YOUR NEW THEME NAME]```)
+15. Run ```npm install```
+16. Run ```composer install```
+17. Open ```gulpfile.js``` in the theme folder
+18. Edit line ~ ```174``` to the name of your local site. *(e.g. my-new-site.vm)*
+19. Save the ```gulpfile```
+20. Visit your new site in the browser and set up Wordpress **MAKE SURE YOU USE ```adtrakwp_``` AS YOUR TABLE PREFIX** (the ```wp-config``` file will be ignored by GIT)  
+21. You may need to edit the ```wp-config.php``` file to change charset. Add this line if this is the case: ```define( 'DB_CHARSET', 'utf8mb4' );```
+22. Log in and activate relevant plugins (except WooCoommerce plugins if you're site will not use them - delete these if so)
+23. Activate your theme through the WordPress admin console
+24. Delete the ```adtrak-skips``` folder from your theme if you are not using it
+25. Open the Command Line / Terminal and make sure you're in your theme folder
+26. Run ```npm run dev``` or ```gulp```
+27. ```npm run dev``` will run the ```development``` tasks, and won't minify your SCSS nor Javascript
 1. Go to [WordPress Settings](#wordpress-settings)
 
 For the Gutenberg directions, see the README inside the theme.
