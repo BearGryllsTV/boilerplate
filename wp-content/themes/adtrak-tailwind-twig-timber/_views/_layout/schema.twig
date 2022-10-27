@@ -1,4 +1,5 @@
 {% for script in options.schema_script %}
+    {% set address = script.schema_address %}
     <script type="application/ld+json">
 
     // Business name, address, opening hours, logo social profiles
@@ -15,20 +16,19 @@
         
         {% if script.schema_image.url %}"image" : "{{ script.schema_image.url }}",{% endif %}
         
-        "url": "{{ site.url }}",
+        "url": "{{ site.url }}"{% if address.streetaddress or script.schema_telephone or script.schema_opening_24_hrs or script.schema_opening_hours or script.site_email or script.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}
         
-        {% set address = script.schema_address %}
-        {% if script.schema_address %}
+        {% if address.streetaddress %}
         "address": {
             "@type": "PostalAddress",
             {% if address.streetaddress %}"streetAddress": "{{ address.streetaddress }}",{% endif %}
             {% if address.addresslocality %}"addressLocality": "{{ address.addresslocality }}",{% endif %}
             {% if address.addressregion %}"addressRegion": "{{ address.addressregion }}",{% endif %}
             {% if address.postalcode %}"postalCode": "{{ address.postalcode }}"{% endif %}
-        },
+        }{% if script.schema_telephone or script.schema_opening_24_hrs or script.schema_opening_hours or script.site_email or script.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}
         {% endif %}
         
-        {% if script.schema_telephone %}"telephone" : "{{ script.schema_telephone }}",{% endif %}
+        {% if script.schema_telephone %}"telephone" : "{{ script.schema_telephone }}"{% if script.schema_opening_24_hrs or script.schema_opening_hours or script.site_email or script.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}{% endif %}
 
         {% if script.schema_opening_24_hrs %}
             "openingHoursSpecification": {
@@ -44,7 +44,7 @@
                 ],
                 "opens": "00:00",
                 "closes": "23:59"
-            },
+            }{% if script.site_email or script.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}
         {% else %}
             {% if script.schema_opening_hours %}
                 "openingHoursSpecification": [
@@ -60,7 +60,7 @@
                             "closes": "{{ item.closing_time }}"
                         }{{ loop.last == false ? ',' }}
                     {% endfor %}
-                ],
+                ]{% if script.site_email or script.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}
             {% endif %}
         {% endif %}
         
