@@ -8,7 +8,7 @@
         "@context" : "http://schema.org",
         "@type": "{{ script.schema_type|default('LocalBusiness') }}",
     
-        "name" : "{{ script.schema_name|default(site.title) }}",
+        "name" : "{{ script.schema_name|default(site.title|replace({'&amp;':'&'})) }}",
 
         {% if script.schema_branch_of %}"branchOf" : "{{ script.schema_branch_of }}",{% endif %}
         
