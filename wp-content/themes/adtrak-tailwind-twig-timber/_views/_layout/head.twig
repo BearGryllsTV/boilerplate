@@ -13,9 +13,9 @@
 				</style>
 		{% endblock %}
 
-  {% if options.google_analytics %}
-    {{ options.google_analytics}}
-  {% endif %}
+  {{ options.google_analytics ? options.google_analytics }}
+
+  {{ options.meta_tags ? options.meta_tags }}
 
   {% include "_layout/schema.twig" %}
   
