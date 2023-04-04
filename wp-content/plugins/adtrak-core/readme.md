@@ -3,8 +3,8 @@
 Contributors: jackabox, zellement
 Tags: core, functionality, acf  
 Requires at least: 4.6.0  
-Tested up to: 4.8.1  
-Stable tag: 0.10.2  
+Tested up to: 6.2
+Stable tag: 0.10.5
 License: GPLv2 or later  
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,18 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 == Frequently Asked Questions ==
 
 == Changelog ==
+= 0.10.5 =
+
+- Trying to fix missing update on some sites.
+
+= 0.10.4 =
+
+- Fix for deprecated WP function get_page_by_title in 6.2 update.
+
+= 0.10.3 =
+
+- Test for automatic updat funcationality. Nothing new in this release.
+
 = 0.10.2 =
 
 - [Bug] Reword cookie notification for personalised ads.
