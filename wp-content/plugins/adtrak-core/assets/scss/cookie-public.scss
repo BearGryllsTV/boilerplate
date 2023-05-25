@@ -12,6 +12,10 @@
     display: block;
 }
 
+#wp-notification.closed {
+    display: none;
+}
+
 .wp-notification-container {
     margin: 0 auto;
     padding: 10px;
