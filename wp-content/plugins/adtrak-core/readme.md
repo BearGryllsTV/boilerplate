@@ -4,7 +4,7 @@ Contributors: jackabox, zellement
 Tags: core, functionality, acf  
 Requires at least: 4.6.0  
 Tested up to: 6.2
-Stable tag: 0.10.6
+Stable tag: 0.10.7
 License: GPLv2 or later  
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 == Frequently Asked Questions ==
 
 == Changelog ==
+
+= 0.10.7 =
+
+- Reword cookie notification to meet Compliance with Google’s EU User Consent Policy requirements.
+- Add an additional sentence under Google Analytics Advertiser on the Cookies page to meet Compliance with Google’s EU User Consent Policy requirements.
+
 = 0.10.6 =
 
 - Adding the CSS fix for the closed cookie banner still appearing at the bottom of the page with no style.
