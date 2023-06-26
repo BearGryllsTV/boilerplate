@@ -116,6 +116,10 @@ Identify and resolve common issues:
 - [ ] Android | Google Pixel 3
 - [ ] Android | Samsung Galaxy S9
 
+## Font Licensing
+
+- [ ] Fill out [Font Registration form] (https://docs.google.com/forms/d/e/1FAIpQLSdfx_zydJCH0zbfXzipgDVK6KWm3SwRX9UAZeHosKkjsGp-GA/viewform)
+
 ## Peer Checklist
 
 - [ ] Set a Project Task to the Copywriter to check the site for spelling errors
