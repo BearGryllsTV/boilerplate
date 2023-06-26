@@ -118,10 +118,14 @@ Identify and resolve common issues:
 - [ ] Mac | Safari
 - [ ] Mac | Chrome
 - [ ] Mac | Firefox
-- [ ] iOS | iPhone 6
-- [ ] iOS | iPhone 11
-- [ ] Android | Google Pixel 3
-- [ ] Android | Samsung Galaxy S9
+- [ ] iOS | iPhone X
+- [ ] iOS | iPhone 14
+- [ ] Android | Google Pixel 6
+- [ ] Android | Samsung Galaxy S22
+
+## Font Licensing
+
+- [ ] Fill out [Font Registration form](https://docs.google.com/forms/d/e/1FAIpQLSdfx_zydJCH0zbfXzipgDVK6KWm3SwRX9UAZeHosKkjsGp-GA/viewform)
 
 ## Peer Checklist
 
