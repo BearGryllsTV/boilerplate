@@ -31,6 +31,7 @@
 - [ ] Create staging URL on Salesforce
 - [ ] Create `cookies-policy` page
 - [ ] Create `404error`
+- [ ] Add a user for IM to create blog posts (with user name of CLIENTNAME eg. Accent on Travel)
 
 ## Design
 
@@ -91,6 +92,7 @@
 
 ## Accessibility
 - [ ] Conduct a Lighthouse test (using Chrome Dev Tools) and check for any quick accessibility improvements that can be made
+- [ ] Ensure all images have explicit widths and heights
 
 Identify and resolve common issues:
 
@@ -107,6 +109,7 @@ Identify and resolve common issues:
 
 - [ ] Xenu Link Sleuth / Screaming Frog - check for broken links
 - [ ] On staging, do a Lighthouse check - are there any areas you can improve on before you proceed?
+- [ ] Image compression - checks images after compression. Are they still good enough?
 
 ## Device Testing
 
