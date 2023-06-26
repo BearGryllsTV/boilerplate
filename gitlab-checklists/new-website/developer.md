@@ -118,7 +118,7 @@ Identify and resolve common issues:
 
 ## Font Licensing
 
-- [ ] Fill out [Font Registration form] (https://docs.google.com/forms/d/e/1FAIpQLSdfx_zydJCH0zbfXzipgDVK6KWm3SwRX9UAZeHosKkjsGp-GA/viewform)
+- [ ] Fill out [Font Registration form](https://docs.google.com/forms/d/e/1FAIpQLSdfx_zydJCH0zbfXzipgDVK6KWm3SwRX9UAZeHosKkjsGp-GA/viewform)
 
 ## Peer Checklist
 
