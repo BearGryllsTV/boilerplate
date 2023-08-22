@@ -44,7 +44,7 @@
                 ],
                 "opens": "00:00",
                 "closes": "23:59"
-            }{% if script.schema_email or options.site_email or script.vat_number or options.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}
+            }{% if script.schema_email or options.site_email or script.vat_number or options.vat_number or script.schema_sameas or script.schema_description or script.schema_areas_served %},{% endif %}
         {% else %}
             {% if script.schema_opening_hours %}
                 "openingHoursSpecification": [
@@ -60,7 +60,7 @@
                             "closes": "{{ item.closing_time }}"
                         }{{ loop.last == false ? ',' }}
                     {% endfor %}
-                ]{% if script.schema_email or options.site_email or script.vat_number or options.vat_number or script.schema_sameas or schema_description or schema_areas_served %},{% endif %}
+                ]{% if script.schema_email or options.site_email or script.vat_number or options.vat_number or script.schema_sameas or script.schema_description or script.schema_areas_served %},{% endif %}
             {% endif %}
         {% endif %}
         
