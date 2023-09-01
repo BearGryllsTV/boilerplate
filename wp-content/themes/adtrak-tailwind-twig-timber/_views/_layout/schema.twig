@@ -84,8 +84,8 @@
         [
             {% for item in script.schema_areas_served %}
                 {
-                    {% if item.type %}"@type": "{{ item.type }}",{% endif %}
-                    {% if item.name %}"name": "{{ item.name }}",{% endif %}
+                    {% if item.type %}"@type": "{{ item.type }}"{{item.name ? ','}}{% endif %}
+                    {% if item.name %}"name": "{{ item.name }}"{{item.id ? ','}}{% endif %}
                     {% if item.id %}"@id": "{{ item.id }}"{% endif %}
                 }{{ loop.last == false ? ',' }}
             {% endfor %}
