@@ -69,7 +69,7 @@
 - [ ] All fields are relevant (postcode/company) - are any more required?
 - [ ] Check the `to` address for each form - will the client get it?
 - [ ] Check the messages each form displays - are they in keeping with the tone of the website?
-- [ ] Form is sending via an SMTP plugin and `thanks@` OR using `Formspree` or `SendInBlue`
+- [ ] Form is sending via an SMTP plugin and `thanks@` OR using `Formspree` or `Brevo`
 - [ ] Update tracking code to match your form solution
 
 ## Ecommerce
