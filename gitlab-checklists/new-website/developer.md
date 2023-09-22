@@ -9,7 +9,7 @@
 - [ ] Is this site having any additional products that need adding, like Data Capture or Mouseflow?
 - [ ] Ensure you know about domains - primary & aliases
 - [ ] Ensure you know how emails will be set up
-- [ ] Ensure `thanks@` email address has been set up if possible (or use `Formspree` or `Sendinblue`)
+- [ ] Ensure `thanks@` email address has been set up if possible (or use `Formspree` or `Brevo`)
 - [ ] Do they have a PPC campaign running to their old site? If so, that will need pausing!
 
 ## General
