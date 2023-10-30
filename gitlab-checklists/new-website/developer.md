@@ -25,6 +25,7 @@
 - [ ] Create `cookies-policy` page
 - [ ] Create `404error`
 - [ ] Add a user for IM to create blog posts (with user name of CLIENTNAME eg. Accent on Travel)
+- [ ] If it's a Breeez site, is it using the Breeez logo in the footer and linking to the Breeez website?
 
 ## Design
 
