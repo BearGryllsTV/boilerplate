@@ -55,6 +55,7 @@ NB: Much of this will be not applicable
 - [ ] Will there be any parked domains?
 - [ ] `thanks@` or `Formspree` or `Brevo` has been decided for forms
 - [ ] If the font is via [Adobe Fonts / Typekit](https://adtrak.lightning.force.com/lightning/r/Password__c/a0J0Y000001TSc5UAG/view), is it being used from the shared account?
+- [ ] Is it a Breeez site? If so, is it using the Breeez logo?
 
 ## Admin
 
