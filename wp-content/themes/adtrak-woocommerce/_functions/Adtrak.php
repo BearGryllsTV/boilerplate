@@ -26,18 +26,29 @@ class Adtrak
         switch ($colour) {
             case 'white':
                 $logo = 'adtrak-white';
+                $company = 'Adtrak';
                 break;
             case 'navy':
                 $logo = 'adtrak-navy';
+                $company = 'Adtrak';
+                break;
+            case 'breeez-navy':
+                $logo = 'breeez-navy';
+                $company = 'Breeez';
+                break;
+            case 'breeez-white':
+                $logo = 'breeez-white';
+                $company = 'Breeez';
                 break;
             default:
                 $logo = 'adtrak';
+                $company = 'Adtrak';
                 break;
         }
 
         $logo = get_theme_file_uri('_resources/images/' . $logo . $end);
 
-        return sprintf('<img class="lazyload" data-src="%s" alt="Adtrak Logo">', $logo);
+        return sprintf('<img class="lazyload" data-src="%s" alt="'. $company .' Logo">', $logo);
     }
 
     /**
