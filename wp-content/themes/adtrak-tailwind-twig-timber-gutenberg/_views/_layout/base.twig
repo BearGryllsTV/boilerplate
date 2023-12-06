@@ -12,6 +12,10 @@
 				{{source("/dist/main.min.css")}}</style>
 		{% endblock %}
 
+		{% if 'adtrak.agency' in site.link %}
+			<meta name="robots" content="noindex">
+		{% endif %}
+
 		{{ options.google_analytics ? options.google_analytics }}
 
 		{{ options.schema ? options.schema }}

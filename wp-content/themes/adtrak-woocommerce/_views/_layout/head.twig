@@ -13,8 +13,12 @@
 		</style>
     {% endblock %}
 
+	{% if 'adtrak.agency' in site.link %}
+		<meta name="robots" content="noindex">
+	{% endif %}
+
     {% if options.google_analytics %}
-    {{ options.google_analytics}}
+    	{{ options.google_analytics}}
     {% endif %}
 
     {% include "_layout/schema.twig" %}

@@ -13,6 +13,10 @@
 				</style>
 		{% endblock %}
 
+    {% if 'adtrak.agency' in site.link %}
+      <meta name="robots" content="noindex">
+    {% endif %}
+
   {{ options.google_analytics ? options.google_analytics }}
 
   {{ options.meta_tags ? options.meta_tags }}
